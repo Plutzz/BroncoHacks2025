@@ -1,0 +1,32 @@
+.classNav {
+    width: 340px;
+    display: flex;
+    border-radius: 25px;
+    background-color: var(--primary);
+  }
+  .classNav div {
+    border-radius: 25px;
+    width: 170px;
+    height: 52px;
+    line-height: 52px;
+    background-color: var(--primary);
+    text-align: center;
+    color: var(--background);
+  }
+  .classNav .active {
+    position: relative;
+    z-index: 3;
+    background-color: var(--accent);
+  }
+  .container {
+    width: 340px;
+    min-height: 500px;
+    border-radius: 25px 25px 0 0;
+    margin: 0 auto;
+    background-color: var(--accent);
+  }
+  .h1 {
+    text-align: center;
+    font-weight: 500;
+    font-size: 3rem;
+  }
