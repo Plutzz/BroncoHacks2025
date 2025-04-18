@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'TestApp',
 ]
 
 MIDDLEWARE = [
@@ -53,7 +54,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',  # or 5173 if using Vite
+    'http://localhost:5173',  # or 5173 if using Vite
 ]
 
 ROOT_URLCONF = 'backend.urls'
