@@ -66,12 +66,13 @@ export default function PostDetail() {
       if (!(await ensureLoggedIn())) return;
       // toggle on server
       await axiosInstance.post("api/posts/like/", { post_id: post.id });
-      // update UI count  flag
-      setPost(prev => ({
-        ...prev,
-        likes_count: prev.likes_count + (isLiked ? -1 : 1)
-      }));
-      setIsLiked(prev => !prev);
+      loadDetail();
+      // // update UI count  flag
+      // setPost(prev => ({
+      //   ...prev,
+      //   likes_count: prev.likes_count + (isLiked ? -1 : 1)
+      // }));
+      // setIsLiked(prev => !prev);
   };
 
   const handleComment = async (e) => {

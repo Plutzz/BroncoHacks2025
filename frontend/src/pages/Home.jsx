@@ -38,7 +38,6 @@ function Home() {
         isLiked: p.liked_by_user ?? false
       }));
       setPosts(enriched);
-      console.log("POSTS", raw);
     } catch (err) {
       console.error("Fetch posts failed:", err);
       if (searchQuery) navigate("/home");
@@ -52,7 +51,6 @@ function Home() {
       const list = Array.isArray(res.data.data)
         ? res.data.data
         : [];
-      console.log("My Projects:", list);
       setUserProjects(list);
     } catch (err) {
       console.error("Fetch my projects failed:", err);
@@ -75,7 +73,6 @@ function Home() {
           selectedTags.length === 0 ||
           post.tags?.some((t) => selectedTags.includes(t))
         );
-  console.log("Filtered posts:", displayPosts);
   const ensureLoggedIn = async () => {
     try {
       const res = await axiosInstance.get("api/accounts/check_authentication/");
@@ -97,22 +94,22 @@ function Home() {
   const handleToggleLike = async (postId) => {
       if (!(await ensureLoggedIn())) return;
       // toggle on the server
-      response = await axiosInstance.post("api/posts/like/", { post_id: postId });
+      await axiosInstance.post("api/posts/like/", { post_id: postId });
+      loadPosts();
       // update UI: flip isLiked and adjust count
-      setPosts(prev =>
-        prev.map(post => {
-          console.log("get post", post)
-          if (post.id === postId) {
-            const liked = !post.isLiked;
-            return {
-              ...post,
-              isLiked: liked,
-              likes: post.likes + (liked ? 1 : -1),
-            };
-          }
-          return post;
-        })
-      );
+      // setPosts(prev =>
+      //   prev.map(post => {
+      //     if (post.id === postId) {
+      //       const liked = !post.isLiked;
+      //       return {
+      //         ...post,
+      //         isLiked: liked,
+      //         likes: post.likes + (liked ? 1 : -1),
+      //       };
+      //     }
+      //     return post;
+      //   })
+      // );
     };
 
   const handleComments = async (e, postId) => {
@@ -224,7 +221,7 @@ function Home() {
               <Button className="bg-green-700 hover:bg-green-800 text-white">Share Project</Button>
             </Link>
           </div>
-
+          {console.log("displayPosts", displayPosts)}
           {displayPosts.length > 0 ? (
             displayPosts.map((post, i) => (
               <motion.div
