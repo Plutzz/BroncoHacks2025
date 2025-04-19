@@ -1,14 +1,31 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Icon } from "./ui/icon";
 import { Home, User, PlusCircle, Search } from "lucide-react";
+import axiosInstance from "../AxiosConfig.js";
 
 function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // This will be replaced with actual auth state
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    setIsLoggedIn(true);
+    axiosInstance.get('api/accounts/check_authentication/')
+      .then(res => {
+        if (res.data.authenticated) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      })
+      .catch(err => {
+        console.error('Auth check error:', err);
+      });
+  }, []);
+
 
   const handleSearch = (e) => {
     e.preventDefault();
