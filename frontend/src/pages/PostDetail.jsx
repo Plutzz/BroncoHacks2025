@@ -145,12 +145,15 @@ export default function PostDetail() {
           ))}
         </p>
         {/* Add images/documents */}
-
-        {currentUser?.id === post.authorId && (
+        {currentUser?.user.id === post.author_id && (
           <>
             <Button
               variant="destructive"
-              onClick={() => setShowDeleteDialog(true)} // Show the delete dialog
+              onClick={() => 
+                {
+                  
+                  setShowDeleteDialog(true)
+                }} // Show the delete dialog
               className="absolute top-4 right-4"
             >
               Delete Post

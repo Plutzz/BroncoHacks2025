@@ -78,6 +78,7 @@ def fetch_posts(request):
                 'title': post.title,
                 'content': post.description,
                 'author': post.user.username,
+                'author_id': post.user.id,
                 'authorAvatar': post.user.avatar.url if post.user.avatar else None,
                 'pitch': post.pitch,
                 'files': post.files.url if post.files else None,
