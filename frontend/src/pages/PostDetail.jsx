@@ -18,13 +18,14 @@ export default function PostDetail() {
 
   useEffect(() => {
     async function loadDetail() {
-        // fetch single post (includes author_id)
-        try {
-          const resp = await axiosInstance.get(`/api/posts/${id}/`);
-          setPost(resp.data.data);
-        } catch {
-          setPost(null);
-        }
+      // fetch all posts, then find this one
+      const resp = await axiosInstance.get("api/posts/fetch_posts/");
+      const found = resp.data.data.find((p) => p.id === Number(id));
+      if (found) {
+        setPost(found);
+      } else {
+        setPost(null);
+      }
 
       // try to fetch current user, but don’t redirect on failure
       try {
@@ -35,7 +36,6 @@ export default function PostDetail() {
         } else {
           setCurrentUser(userRes.data);
         }
-
       } catch {
         setCurrentUser(null);
       }
@@ -191,7 +191,7 @@ export default function PostDetail() {
             );
           }
         ))}
-        {currentUser?.id === post.author_id && (
+        {currentUser?.user.id === post.author_id && (
           <>
 
             <Trash

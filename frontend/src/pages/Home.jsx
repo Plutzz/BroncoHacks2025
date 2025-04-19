@@ -27,14 +27,21 @@ function Home() {
   const loadPosts = async () => {
     try {
       let res;
-      if (searchQuery === "") {
+      if (!searchQuery) {
         res = await axiosInstance.get("api/posts/fetch_posts/");
         setPosts(res.data.data || []);
       } else {
         res = await axiosInstance.get(
           `/api/posts/search/?search=${encodeURIComponent(searchQuery)}`
         );
-        setPosts(Array.isArray(res.data.results) ? res.data.results : []);
+      }
+
+      if (Array.isArray(res.data.data)) {
+        setPosts(res.data.data);
+      } else if (Array.isArray(res.data.results)) {
+        setPosts(res.data.results);
+      } else {
+        setPosts([]);
       }
     } catch (err) {
       console.error("Fetch posts failed:", err);
