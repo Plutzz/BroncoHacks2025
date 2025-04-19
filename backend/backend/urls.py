@@ -21,10 +21,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
 
+from accounts import views as accounts_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('TestApp/', include('TestApp.urls')),
+    path('accounts/', include('accounts.urls')),
     path('', TemplateView.as_view(template_name='index.html'), name='index'),
 ]
 
