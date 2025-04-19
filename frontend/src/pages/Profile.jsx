@@ -8,6 +8,7 @@ import axiosInstance from "../AxiosConfig.js";
 
 
 export default function Profile() {
+    const navigate = useNavigate();   
     const [profile, setProfile] = useState({
       name: "",
       avatar: "",
@@ -22,7 +23,7 @@ export default function Profile() {
   
     useEffect(() => {
       axiosInstance
-        .get("api/accounts/profile/")
+        .get("api/userprofile/profile-data/")
         .then(res => setProfile(res.data))
         .catch(err => console.error("Failed to load profile:", err));
     }, []);
@@ -51,10 +52,25 @@ export default function Profile() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-2xl mx-auto"
       >
+      <div className="flex justify-end mb-6">
+        <Button variant="destructive" onClick={handleSignOut}>
+          Log Out
+        </Button>
+      </div>
+
+      <div className="text-center mb-8">
+        <img
+          className="h-32 w-32 rounded-full mx-auto mb-4"
+          src={avatar || "/images/default-avatar.png"}
+          alt={`${name}'s avatar`}
+        />
+        <h1 className="text-3xl font-bold">{name || "Your Name"}</h1>
+        <p className="text-gray-400">{occupation || "Your Occupation"}</p>
+      </div>
         <div className="text-center mb-8">
           <img
             className="h-32 w-32 rounded-full mx-auto mb-4"
-            src={avatar || "/default-avatar.png"}
+            src={avatar || "images/default-avatar.png"}
             alt={`${name}'s avatar`}
           />
           <h1 className="text-3xl font-bold">{name || "Your Name"}</h1>
