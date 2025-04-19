@@ -5,8 +5,9 @@ import { motion } from "framer-motion";
 import { Heart, MessageCircle, ArrowLeft, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import axiosInstance from "../AxiosConfig.js";
 
-function PostDetail() {
+export default function PostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -21,7 +22,25 @@ function PostDetail() {
     }
   }, [id]);
 
-  const handleLike = () => {
+  const ensureLoggedIn = async () => {
+    try {
+      const res = await axiosInstance.get("api/accounts/check_authentication/");
+      if (!res.data.authenticated) {
+        toast({ title: "Please log in first" });
+        navigate("/login");
+        return false;
+      }
+      return true;
+    } catch {
+      toast({ title: "Please log in first" });
+      navigate("/login");
+      return false;
+    }
+  };
+
+  const handleLike = async () => {
+    if (!(await ensureLoggedIn())) return;
+
     const posts = JSON.parse(localStorage.getItem("posts") || "[]");
     const updatedPosts = posts.map((p) =>
       p.id === Number(id) ? { ...p, likes: (p.likes || 0) + 1 } : p
@@ -30,8 +49,9 @@ function PostDetail() {
     setPost((prev) => ({ ...prev, likes: (prev.likes || 0) + 1 }));
   };
 
-  const handleComment = (e) => {
+  const handleComment = async (e) => {
     e.preventDefault();
+    if (!(await ensureLoggedIn())) return;
     if (!comment.trim()) return;
 
     const newComment = {
@@ -122,7 +142,24 @@ function PostDetail() {
             </div>
           </div>
         )}
-
+        {/* DELETE POST IF IT IS THE SAME AUTHOR */}
+        {user?.id === post.authorId && (
+          <Button
+            variant="destructive"
+            onClick={() => {
+              const posts = JSON.parse(localStorage.getItem("posts") || "[]");
+              const updatedPosts = posts.filter(p => p.id !== id);
+              localStorage.setItem("posts", JSON.stringify(updatedPosts));
+              toast({
+                title: "Success",
+                description: "Post deleted successfully."
+              });
+              navigate("/");
+            }}
+          >
+            Delete Post
+          </Button>
+        )}
         {post.githubLink && (
           <a
             href={post.githubLink}
@@ -190,4 +227,3 @@ function PostDetail() {
   );
 }
 
-export default PostDetail;

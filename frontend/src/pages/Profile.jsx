@@ -72,7 +72,7 @@ export default function Profile() {
             src={avatar || "images/default-avatar.png"}
             alt={`${name}'s avatar`}
           />
-          <h1 className="text-3xl font-bold">{name || "Your Name"}</h1>
+          <h1 className="text-3xl font-bold">{name?.trim() ? name : "Your Name"}</h1>
           <p className="text-gray-400">{occupation || "Your Occupation"}</p>
         </div>
 

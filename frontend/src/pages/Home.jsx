@@ -3,27 +3,45 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Heart, MessageCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../AxiosConfig.js";
+import { useToast } from "../components/ui/use-toast";
 
 function Home() {
   const [posts, setPosts] = useState([]);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  // HELPER FUNCTIONS
+  const ensureLoggedIn = async () => {
+    try {
+      const res = await axiosInstance.get("api/accounts/check_authentication/");
+      if (!res.data.authenticated) {
+        toast({ title: "Please log in first" });
+        navigate("/login");
+        return false;
+      }
+      return true;
+    } catch {
+      toast({ title: "Please log in first" });
+      navigate("/login");
+      return false;
+    }
+  };
 
-  useEffect( async () => {
-    const response = await axiosInstance.get('api/posts/fetch_posts/')
-      .then(res => {
-        console.log("POST", res.data.data)
-        setPosts(res.data.data)
-        
-      })
-      .catch(err => {
-        console.error('Create post error:', err);
-      });
-
-      console.log(response)
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await axiosInstance.get("api/posts/fetch_posts/");
+        setPosts(res.data.data);
+      } catch (err) {
+        console.error("Fetch posts failed:", err);
+      }
+    }
+    load();
   }, []);
 
-  const handleLike = (postId) => {
+  const handleLike = async (postId) => {
+    if (!(await ensureLoggedIn())) return;
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.id === postId
@@ -32,6 +50,14 @@ function Home() {
       )
     );
   };
+
+  const handleComments = async (e, postId) => {
+    e.preventDefault();
+    if (!(await ensureLoggedIn())) return;
+    navigate(`/post/${postId}`);
+  };
+
+  
 
   return (
     <div className="space-y-8">
@@ -42,6 +68,9 @@ function Home() {
             key={post.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            onClick={async () => {
+              if (await ensureLoggedIn()) navigate(`/post/${post.id}`);
+            }}
             className="rounded-lg border border-gray-700 bg-gray-800/50 p-6 hover:border-gray-600 transition-colors"
           >
             <Link to={`/post/${post.id}`}>
@@ -72,6 +101,7 @@ function Home() {
                 <Button
                   variant="ghost"
                   size="sm"
+                  onClick={(e) => handleComments(e, post.id)}
                   className="flex items-center gap-2"
                 >
                   <MessageCircle className="h-4 w-4" />
