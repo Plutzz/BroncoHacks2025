@@ -101,7 +101,8 @@ export default function Profile() {
           fd.append('occupation', formData.occupation);
           fd.append('bio', formData.bio);
           fd.append('email', formData.email);
-
+          fd.append('tags', formData.tags);
+          console.log(formData.tags)
           if (fileRef.current.files[0]) {
             fd.append('avatar', fileRef.current.files[0]);
           }

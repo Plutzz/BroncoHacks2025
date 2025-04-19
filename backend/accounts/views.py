@@ -90,5 +90,19 @@ def update_profile(request):
     serializer = UserProfileSerializer(user, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
+
+        tag_names = request.data.get('tags')
+        if tag_names:
+            if isinstance(tag_names, str):
+                tag_names = [t.strip() for t in tag_names.split(',')]
+
+            tag_objs = []
+            for name in tag_names:
+                tag, created = Tag.objects.get_or_create(name=name)
+                tag_objs.append(tag)
+
+            user.tags.set(tag_objs)  # Replace existing tags
+            user.save()
+
         return Response({'message': 'Profile updated successfully', 'user': serializer.data}, status=200)
     return Response(serializer.errors, status=400)
