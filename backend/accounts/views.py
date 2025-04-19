@@ -1,11 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from accounts.models import CustomUser
+from rest_framework import status
 from posts.models import Tag
 from django.http import JsonResponse
+from .serializers import UserProfileSerializer
+from rest_framework.permissions import IsAuthenticated
 
 @ensure_csrf_cookie
 @api_view(['POST'])
@@ -78,3 +81,14 @@ def get_current_user(request):
             'email': user.email,
         }
     }, status=200)
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_profile(request):
+    user = request.user
+    print(request.data)
+    serializer = UserProfileSerializer(user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'message': 'Profile updated successfully', 'user': serializer.data}, status=200)
+    return Response(serializer.errors, status=400)

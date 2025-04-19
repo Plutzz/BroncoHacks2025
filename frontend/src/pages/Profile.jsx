@@ -105,7 +105,7 @@ export default function Profile() {
           if (fileRef.current.files[0]) {
             fd.append('avatar', fileRef.current.files[0]);
           }
-          await axiosInstance.put('api/userprofile/update-profile/', fd, {
+          await axiosInstance.patch('api/accounts/update/', fd, {
             headers: {'Content-Type': 'multipart/form-data'}
           });
           setProfile(prev => ({ ...prev, ...formData }));
