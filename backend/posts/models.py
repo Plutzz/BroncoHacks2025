@@ -15,6 +15,9 @@ class Post(models.Model):
     tech_stack = models.TextField(default="N/A")
     view_count = models.IntegerField(default=0)  # number of views
     description = models.TextField()
+    files = models.FileField(upload_to='files/', blank=True, null=True)  # for file uploads
+    image = models.ImageField(upload_to='images/', blank=True, null=True)  # for image uploads
+    video = models.FileField(upload_to='videos/', blank=True, null=True)  # for video uploads
     github_link = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
