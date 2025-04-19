@@ -67,6 +67,11 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+}
+
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # or 5173 if using Vite
     'http://localhost:8000',  # or 5173 if using Vite

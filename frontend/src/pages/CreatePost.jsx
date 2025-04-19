@@ -35,11 +35,12 @@ function CreatePost() {
     fd.append("description", formData.description);
     fd.append("tech_stack", formData.techStack);
     fd.append("github_link", formData.githubLink);
-    formData.tags.forEach(tag => fd.append("tags", tag));
+    fd.append("tags", formData.tags);
     if (fileRef.current?.files.length) {
         Array.from(fileRef.current.files)
           .forEach(file => fd.append("files", file));
     }
+    console.log(fd.data);
     await axiosInstance.post("/api/posts/create/", fd, {
       headers: { "Content-Type": "multipart/form-data" }
     });

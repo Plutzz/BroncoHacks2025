@@ -19,8 +19,8 @@ def create_post(request):
             description = data.get('description')
             files = data.get('files')
             github_link = data.get('github_link')
-            tag_names = data.get('tags', [])
-
+            tag_names = data.get('tags').split(",")
+            print("TAGS", tag_names)
             if not title or not description or not pitch:
                 return JsonResponse({'error': 'Missing title or content.'}, status=400)
 
@@ -97,7 +97,7 @@ def fetch_posts(request):
                 'tags': tag_names,
             })
         
-        print("POST DATA", post_data)
+        # print("POST DATA", post_data)
 
         return JsonResponse({
             'message': 'Posts fetched successfully',

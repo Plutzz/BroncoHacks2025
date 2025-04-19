@@ -133,7 +133,7 @@ function Home() {
                   >
                     <h3 className="font-medium text-sm">{proj.title}</h3>
                     <p className="text-xs text-gray-400 mt-1">
-                      {proj.content?.substring(0, 60) || ""}
+                      {proj.pitch?.substring(0, 60) || ""}
                     </p>
                   </Link>
                 </li>
@@ -178,7 +178,7 @@ function Home() {
                     </h2>
                   </div>
                     <p className="text-gray-300 mb-4">
-                      {post.content?.substring(0, 150) || ""}
+                      {post.pitch?.substring(0, 150) || ""}
                     </p>
                     <div className="flex flex-wrap gap-2 mb-4">
                       {post.tags?.map((t) => (
