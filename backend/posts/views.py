@@ -65,7 +65,7 @@ def fetch_posts(request):
 # =======================
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@login_required
 def like_post(request, post_id):
     # parse payload
     try:
