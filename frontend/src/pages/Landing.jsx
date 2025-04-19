@@ -7,30 +7,45 @@ import { Button } from "../components/ui/button";
 const Landing = () => {
 
   return (
-    <div className="    min-h-screen
-      flex flex-col items-center justify-center -mt-16"
-    >
+    <div className="min-h-screen flex flex-col items-center justify-center -mt-16">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         className="text-center max-w-4xl mx-auto px-4"
       >
-        <motion.h1 
-          className="text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600"
+        <motion.h1
+          className="text-6xl font-bold mb-6 bg-clip-text text-transparent"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
+          style={{
+            background: "linear-gradient(to right, #6ee7b7, #3b82f6, #9333ea)",
+            backgroundSize: "200% 200%",
+            animation: "gradientBreathing 5s ease-in-out infinite",
+            WebkitBackgroundClip: "text", /* For Safari */
+            backgroundClip: "text",
+            color: "transparent", /* Make sure the text color is transparent */
+          }}
         >
+
+          DevDrop
+        </motion.h1>
+        <div className="flex justify-center">
           <img
             src="/images/landing_logo.png"
             alt="DevDrop logo"
-            className="h-16 w-16 inline-block ml-2"
+            className="h-32 w-32"
           />
-          DevDrop
-        </motion.h1>
+        </div>
+
+
+
         <motion.p 
-          className="text-2xl text-gray-300 mb-12"
+          className="text-2xl text-gray-300 mb-12 mt-6 "
+          style={{
+            textShadow: '0 0 4px rgba(255, 255, 255, 0.5), 0 0 8px rgba(255, 255, 255, 0.4)',
+          }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
