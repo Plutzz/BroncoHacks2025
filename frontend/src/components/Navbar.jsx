@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Icon } from "./ui/icon";
@@ -10,6 +10,7 @@ import axiosInstance from "../AxiosConfig.js";
 function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [searchQuery, setSearchQuery] = useState("");
+  const location = useLocation();
 
   useEffect(() => {
     axiosInstance.get('api/accounts/check_authentication/')
@@ -23,7 +24,7 @@ function Navbar() {
       .catch(err => {
         console.error('Auth check error:', err);
       });
-  }, []);
+  }, [location]);
 
 
   const handleSearch = (e) => {
