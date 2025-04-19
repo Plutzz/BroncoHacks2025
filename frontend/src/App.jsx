@@ -16,7 +16,7 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
         <Navbar />
-        <main className="container mx-auto px-4 py-8">
+        <main className="px-2 py-8">
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/home" element={<Home />} />

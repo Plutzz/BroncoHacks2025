@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from accounts.models import CustomUser
-
+from posts.models import Tag
 
 @ensure_csrf_cookie
 @api_view(['POST'])
@@ -41,7 +41,14 @@ def register_view(request):
         username = request.data.get('username')
         password = request.data.get('password')
         email = request.data.get('email')
+        tags = request.data.get('tags', [])
         
+        for tag in tags:
+            try:
+                tag_obj, created = Tag.objects.get_or_create(name=tag)
+                tags.append(tag_obj)
+            except Exception as e:
+                return Response({'success': False, 'error': str(e)}, status=400)
         try:
             user = CustomUser.objects.create_user(username, email, password)
             login(request, user)

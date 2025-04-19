@@ -6,6 +6,17 @@ import { Button } from "../components/ui/button";
 import { useToast } from "../components/ui/use-toast";
 import axiosInstance from "../AxiosConfig.js";
 
+
+const TECH_TAGS = [
+  "JavaScript", "React", "Node.js", "Python", "Java", "DevOps",
+  "Machine Learning", "Cloud Computing", "Cybersecurity", "Mobile Development", "Game Development",
+  "Data Science", "Blockchain", "Web Development", "UI/UX Design",
+  "Database Management", "Networking", "Software Engineering", "Agile Development", "Open Source",
+  "Artificial Intelligence", "Internet of Things (IoT)", "Big Data", "Virtual Reality (VR)", "Augmented Reality (AR)",
+  "DevSecOps", "Microservices", "Serverless Architecture", "Cross-Platform Development",
+];
+
+
 function CreatePost() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -15,6 +26,7 @@ function CreatePost() {
     techStack: "",
     githubLink: "",
     pitch:"",
+    tags: [],
   });
 
   const handleSubmit = async (e) => {
@@ -39,7 +51,7 @@ function CreatePost() {
       description: "Your project has been posted.",
     });
 
-    navigate("/");
+    navigate("/home");
   };
 
   const handleChange = (e) => {

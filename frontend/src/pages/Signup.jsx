@@ -1,10 +1,18 @@
 
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useToast } from "../components/ui/use-toast";
 import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import axiosInstance from "../AxiosConfig.js";
+
+
+const TECH_TAGS = [
+  "JavaScript", "React", "Node.js", "Python", "Java", "DevOps",
+  "Machine Learning", "Cloud Computing", "Cybersecurity", "Mobile Development", "Game Development",
+  "Data Science", "Blockchain", "Web Development", "UI/UX Design",
+];
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -12,7 +20,12 @@ function Signup() {
     email: "",
     password: "",
     confirmPassword: "",
+    selectedTags: [],
   });
+
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,11 +39,12 @@ function Signup() {
     // Send signup request
     try {
 
-      const response = await axiosInstance.post('api/accounts/register/', 
+      const response = await axiosInstance.post('/api/accounts/register/', 
         {
           username: formData.username,
           email: formData.email,
           password: formData.password,
+          tags: formData.selectedTags,
         }
       );
 
@@ -38,11 +52,11 @@ function Signup() {
       console.log("Response:", response);
 
       if (response.data.success) {
-        navigate("/");
+        navigate("/home");
       } else {
         toast({
           title: "Sign Up failed",
-          description: res.data.error,
+          description: response.data.error,
           variant: "destructive",
         });
       }
@@ -51,7 +65,17 @@ function Signup() {
       console.error("Error during signup:", error);
       alert("Signup failed. Please try again.");
     }
-};
+  };
+
+
+  const toggleTag = (tag) => {
+    setFormData(prev => ({
+      ...prev,
+      selectedTags: prev.selectedTags.includes(tag)
+        ? prev.selectedTags.filter(t => t !== tag)
+        : [...prev.selectedTags, tag]
+    }));
+  };
 
   return (
     <motion.div
@@ -105,11 +129,27 @@ function Signup() {
               />
             </div>
           )}
+
+        <div>
+          <label className="block mb-2 text-center mt-4">Select Your Interests</label>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {TECH_TAGS.map(tag => (
+              <Button
+                key={tag}
+                type="button"
+                variant={formData.selectedTags.includes(tag) ? "default" : "secondary"}
+                onClick={() => toggleTag(tag)}
+                className="text-sm"
+              >
+                {tag}
+              </Button>
+            ))}
+          </div>
+        </div>
         <Button type="submit" className="w-full">
           Sign up
         </Button>
       </form>
-
       <p className="text-center mt-4 text-gray-400">
         Already have an account?{" "}
         <Link to="/login" className="text-blue-500 hover:underline">

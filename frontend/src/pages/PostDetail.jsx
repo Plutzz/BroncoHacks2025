@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Heart, MessageCircle, ArrowLeft, Github } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { Button } from "../components/ui/button";
+import { useToast } from "../components/ui/use-toast";
 import axiosInstance from "../AxiosConfig.js";
 
 export default function PostDetail() {
@@ -110,7 +110,7 @@ export default function PostDetail() {
     >
       <Button
         variant="ghost"
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/home")}
         className="mb-6"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />

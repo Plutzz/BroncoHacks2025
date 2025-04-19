@@ -21,7 +21,7 @@ function Login() {
       const res = await axiosInstance.post("/api/accounts/login/", formData);
       if (res.data.success) {
         // on success, go to home
-        navigate("/");
+        navigate("/home");
       } else {
         // on failure, show notification
         toast({

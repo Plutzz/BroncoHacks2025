@@ -1,19 +1,83 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Heart, MessageCircle } from "lucide-react";
+import { BookMarked, Tag, Filter, Heart, MessageCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import axiosInstance from "../AxiosConfig.js";
 import { useToast } from "../components/ui/use-toast";
 
+const POPULAR_TAGS = [
+  "JavaScript", "React", "Node.js", "Python", "Java", "DevOps",
+  "Machine Learning", "Cloud Computing", "Cybersecurity", "Mobile Development"
+];
+
 function Home() {
+  const tags = POPULAR_TAGS;
   const [posts, setPosts] = useState([]);
+  const [userProjects, setUserProjects] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
+
   // HELPER FUNCTIONS
+  useEffect(() => {
+    async function loadProjects() {
+      try {
+        const res = await axiosInstance.get("api/projects/my_projects/");
+        const list = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data.data)
+            ? res.data.data
+            : [];
+        console.log("User Projects:", list);
+        setUserProjects(list);
+      } catch (err) {
+        console.error("Fetch projects failed:", err);
+      }
+    }
+    loadProjects();
+  }, []);
+
+  useEffect(() => {
+    async function loadPosts() {
+      try {
+        let res;
+        if (searchQuery === "") {
+          res = await axiosInstance.get("api/posts/fetch_posts/");
+          setPosts(res.data.data || []);
+        } else {
+          res = await axiosInstance.get(
+            `/api/posts/search/?search=${encodeURIComponent(searchQuery)}`
+          );
+          console.log("fetch_posts Results:", res.data.results);
+          setPosts(Array.isArray(res.data.results) ? res.data.results : []);
+        }
+      } catch (err) {
+        console.error("Fetch posts failed:", err);
+        if (searchQuery) {
+          navigate("/home");
+        }
+      }
+    }
+    loadPosts();
+  }, [searchQuery, location.key, navigate]);
+
+  // toggle tag selection
+  const toggleTag = (tag) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+      );
+  };
+
+  // filter posts by selected tags
+  const filteredPosts = posts.filter((post) =>
+    selectedTags.length === 0 || post.tags?.some((t) => selectedTags.includes(t))
+  );
+
   const ensureLoggedIn = async () => {
     try {
       const res = await axiosInstance.get("api/accounts/check_authentication/");
@@ -30,30 +94,6 @@ function Home() {
     }
   };
 
-  useEffect(() => {
-    async function load() {
-      try {
-        if(searchQuery==='')
-        {
-          console.log("NO SEARCH QUERY", searchQuery)
-          const res = await axiosInstance.get("api/posts/fetch_posts/");
-          console.log(res.data.data)
-          setPosts(res.data.data);
-        }
-        else
-        {
-          console.log("SEARCH QUERY", searchQuery)
-          const res = await axiosInstance.get(`/api/posts/search/?search=${encodeURIComponent(searchQuery)}`);
-          console.log(res.data.results)
-          setPosts(res.data.results);
-        }
-        
-      } catch (err) {
-        console.error("Fetch posts failed:", err);
-      }
-    }
-    load();
-  }, [searchQuery]);
 
   const handleLike = async (postId) => {
     if (!(await ensureLoggedIn())) return;
@@ -75,58 +115,137 @@ function Home() {
   
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-3xl font-bold">Developer Projects Feed</h1>
-      <div className="grid gap-6">
-        {posts.map((post) => (
-          <motion.div
-            key={post.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            onClick={async () => {
-              if (await ensureLoggedIn()) navigate(`/post/${post.id}`);
-            }}
-            className="rounded-lg border border-gray-700 bg-gray-800/50 p-6 hover:border-gray-600 transition-colors"
-          >
-            <Link to={`/post/${post.id}`}>
-              <div className="flex items-center gap-4 mb-4">
-                <img className="h-10 w-10 rounded-full" alt="User avatar" src="https://images.unsplash.com/photo-1666892666066-abe5c4865e9c" />
-                <div>
-                  <h3 className="font-semibold">{post.author}</h3>
-                  <p className="text-sm text-gray-400">{post.date}</p>
-                </div>
-              </div>
-              <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
-              <p className="text-gray-300 mb-4">{post.description}</p>
+    <div className="flex gap-8 max-w-7xl mx-auto py-8">
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="hidden lg:block w-64 shrink-0" >
+        <div className="bg-gray-800 rounded-lg p-4 sticky top-20">
+          <div className="flex items-center gap-2 mb-4">
+            <BookMarked className="w-5 h-5 text-blue-400" />
+            <h2 className="text-lg font-semibold">My Projects</h2>
+          </div>
+          {userProjects.length > 0 ? (
+            <ul className="space-y-3">
+              {userProjects.map((proj) => (
+                <li key={proj.id}>
+                  <Link
+                    to={`/post/${proj.id}`}
+                    className="block p-3 rounded-md hover:bg-gray-700 transition-colors"
+                  >
+                    <h3 className="font-medium text-sm">{proj.title}</h3>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {proj.content?.substring(0, 60) || ""}
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-gray-400">No projects yet</p>
+          )}
+        </div>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex-1 min-w-0"
+      >
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold">Developer Feed</h1>
+            <Link to="/create-post">
+              <Button className="bg-green-500 hover:bg-green-600 text-white">Share Project</Button>
             </Link>
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleLike(post.id);
-                }}
-                className="flex items-center gap-2"
-              >
-                <Heart className="h-4 w-4" />
-                <span>{post.likes}</span>
-              </Button>
-              <Link to={`/post/${post.id}`}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => handleComments(e, post.id)}
-                  className="flex items-center gap-2"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  <span>{post.comments?.length || 0}</span>
-                </Button>
-              </Link>
+          </div>
+
+          {filteredPosts.length > 0 ? (
+            filteredPosts.map((post, i) => (
+              <motion.div
+                key={post.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-gray-800 rounded-lg p-6 hover:shadow-xl transition-all hover:scale-[1.02]">
+                <Link to={`/post/${post.id}`}>
+                  <h2 className="text-xl font-semibold mb-2 hover:text-blue-400 transition-colors">
+                    {post.title}
+                  </h2>
+                  <p className="text-gray-300 mb-4">
+                    {post.description?.substring(0, 150) || ""}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {post.tags?.map((t) => (
+                      <span
+                        key={t}
+                        className="bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleLike(post.id);
+                      }}
+                      className="flex items-center gap-2"
+                    >
+                      <Heart className="h-4 w-4" />
+                      <span>{post.likes}</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => handleComments(e, post.id)}
+                      className="flex items-center gap-2"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      <span>{post.comments?.length || 0}</span>
+                    </Button>
+                  </div>
+                </Link>
+              </motion.div>
+            ))
+          ) : (
+            <div className="text-center py-10">
+              <p className="text-gray-400">
+                No posts match the selected tags.
+              </p>
             </div>
-          </motion.div>
-        ))}
-      </div>
+          )}
+        </div>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="hidden lg:block w-64 shrink-0"
+      >
+        <div className="bg-gray-800 rounded-lg p-4 sticky top-20">
+          <div className="flex items-center gap-2 mb-4">
+            <Tag className="w-5 h-5 text-blue-400" />
+            <h2 className="text-lg font-semibold">Filter by Tags</h2>
+          </div>
+          <div className="space-y-2">
+            {tags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                  selectedTags.includes(tag)
+                    ? "bg-blue-600/20 text-blue-400"
+                    : "hover:bg-gray-700 text-gray-300"
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }

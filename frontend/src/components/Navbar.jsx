@@ -36,9 +36,9 @@ function Navbar() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    navigate(`/?search=${encodeURIComponent(searchQuery)}`);
-    // Implement search functionality here
-    console.log("Searching for:", searchQuery);
+    const q = encodeURIComponent(searchQuery.trim());
+    // if empty or failed later, Home.jsx will redirect to /home
+    navigate(`/home${q ? `?search=${q}` : ""}`);
   };
 
   return (
