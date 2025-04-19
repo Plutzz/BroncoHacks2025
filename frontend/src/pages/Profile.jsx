@@ -102,7 +102,6 @@ export default function Profile() {
           fd.append('bio', formData.bio);
           fd.append('email', formData.email);
           fd.append('tags', formData.tags);
-          console.log(formData.tags)
           if (fileRef.current.files[0]) {
             fd.append('avatar', fileRef.current.files[0]);
           }
@@ -112,7 +111,7 @@ export default function Profile() {
           setProfile(prev => ({ ...prev, ...formData }));
           setEditing(false);
           toast({ title: "Profile updated successfully" });
-          window.location.reload();
+          // window.location.reload();
         } catch (err) {
           console.error("Update failed:", err);
           toast({ title: "Failed to update profile." });

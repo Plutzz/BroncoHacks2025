@@ -25,6 +25,7 @@ def user_profile_data(request):
             'first_name': user.first_name,
             'last_name': user.last_name,
             'bio': user.bio,
+            'occupation': user.occupation,
             'profile_picture': user.avatar.url if user.avatar else None,
         }
 
