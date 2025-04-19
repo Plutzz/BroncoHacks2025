@@ -17,32 +17,32 @@ export default function PostDetail() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
-    async function loadDetail() {
-      // fetch all posts, then find this one
-      const resp = await axiosInstance.get("api/posts/fetch_posts/");
-      const found = resp.data.data.find((p) => p.id === Number(id));
-      if (found) {
-        setPost(found);
-      } else {
-        setPost(null);
-      }
-
-      // try to fetch current user, but don’t redirect on failure
-      try {
-        const userRes = await axiosInstance.get("api/accounts/get_current_user/");
-
-        if (userRes == null) {
-          setCurrentUser(null);
-        } else {
-          setCurrentUser(userRes.data);
-        }
-      } catch {
-        setCurrentUser(null);
-      }
-    }
     loadDetail();
   }, [id]);
 
+  async function loadDetail() {
+    // fetch all posts, then find this one
+    const resp = await axiosInstance.get("api/posts/fetch_posts/");
+    const found = resp.data.data.find((p) => p.id === Number(id));
+    if (found) {
+      setPost(found);
+    } else {
+      setPost(null);
+    }
+
+    // try to fetch current user, but don’t redirect on failure
+    try {
+      const userRes = await axiosInstance.get("api/accounts/get_current_user/");
+
+      if (userRes == null) {
+        setCurrentUser(null);
+      } else {
+        setCurrentUser(userRes.data);
+      }
+    } catch {
+      setCurrentUser(null);
+    }
+  }
   const ensureLoggedIn = async () => {
     try {
       const res = await axiosInstance.get("api/accounts/check_authentication/");
@@ -61,13 +61,8 @@ export default function PostDetail() {
 
   const handleLike = async () => {
     if (!(await ensureLoggedIn())) return;
-
-    const posts = JSON.parse(localStorage.getItem("posts") || "[]");
-    const updatedPosts = posts.map((p) =>
-      p.id === Number(id) ? { ...p, likes: (p.likes || 0) + 1 } : p
-    );
-    localStorage.setItem("posts", JSON.stringify(updatedPosts));
-    setPost((prev) => ({ ...prev, likes: (prev.likes || 0) + 1 }));
+    const response = await axiosInstance.post("api/posts/like/", {post_id:post.id})
+    loadDetail();
   };
 
 
@@ -149,51 +144,43 @@ export default function PostDetail() {
           ))}
         </p>
         {/* Add images/documents */}
-        {post.files && (
-          (() => {
-            const files = Array.isArray(post.files)
-              ? post.files
-              : [post.files];
-            if (!files.length) return null;
-            return (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-2">Attachments</h3>
-                    <div className="flex flex-wrap gap-4">
-                      {post.files.map((fileUrl, idx) =>
-                        /\.(jpe?g|png|gif)$/i.test(fileUrl) ? (
-                          <img
-                            key={idx}
-                            src={fileUrl}
-                            alt={`attachment-${idx}`}
-                            className="max-h-48 rounded border border-gray-600"
-                          />
-                        ) : /\.(mp4|webm|ogg)$/i.test(fileUrl) ? (
-                          <video
-                            key={idx}
-                            src={fileUrl}
-                            controls
-                            className="max-h-60 rounded border border-gray-600"
-                          />
-                        ) : (
-                          <a
-                            key={idx}
-                            href={fileUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-400 hover:underline"
-                          >
-                            {fileUrl.split("/").pop()}
-                          </a>
-                        )
-                      )}
-                    </div>
-                  </div>
-            );
-          }
-        ))}
+        {Array.isArray(post.files) && post.files.length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-2">Attachments</h3>
+          <div className="flex flex-wrap gap-4">
+            {post.files.map((fileUrl, idx) =>
+              /\.(jpe?g|png|gif)$/i.test(fileUrl) ? (
+                <img
+                  key={idx}
+                  src={fileUrl}
+                  alt={`attachment-${idx}`}
+                  className="max-h-48 rounded border border-gray-600"
+                />
+              ) : /\.(mp4|webm|ogg)$/i.test(fileUrl) ? (
+                <video
+                  key={idx}
+                  src={fileUrl}
+                  controls
+                  className="max-h-60 rounded border border-gray-600"
+                />
+              ) : (
+                <a
+                  key={idx}
+                  href={fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:underline"
+                >
+                  {fileUrl.split("/").pop()}
+                </a>
+              )
+            )}
+          </div>
+        </div>
+      )}
+
         {currentUser?.user.id === post.author_id && (
           <>
-
             <Trash
               variant="destructive"
               onClick={() => setShowDeleteDialog(true)}

@@ -168,7 +168,7 @@ export default function EditPost() {
             ref={fileRef}
             multiple
             onChange={e => setFormData(prev => ({ ...prev, files: e.target.files }))}
-            accept="files/*"
+            accept="image/*"
             className="block w-full text-sm"
           />
         </div>
