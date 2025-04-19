@@ -36,13 +36,13 @@ function Home() {
         );
       }
 
-      if (Array.isArray(res.data.data)) {
-        setPosts(res.data.data);
-      } else if (Array.isArray(res.data.results)) {
-        setPosts(res.data.results);
-      } else {
-        setPosts([]);
-      }
+      const raw = res.data.data ?? res.data.results ?? [];
+
+      const enriched = raw.map(p => ({
+        ...p,
+        isLiked: p.liked_by_user ?? false
+      }));
+      setPosts(enriched);
     } catch (err) {
       console.error("Fetch posts failed:", err);
       if (searchQuery) navigate("/home");
@@ -96,11 +96,27 @@ function Home() {
     }
   };
 
-  const handleLike = async (postId) => {
-    if (!(await ensureLoggedIn())) return;
-    const response = await axiosInstance.post("api/posts/like/", {post_id:postId})
-    loadPosts();
-  };
+
+
+  const handleToggleLike = async (postId) => {
+      if (!(await ensureLoggedIn())) return;
+      // toggle on the server
+      await axiosInstance.post("api/posts/like/", { post_id: postId });
+      // update UI: flip isLiked and adjust count
+      setPosts(prev =>
+        prev.map(post => {
+          if (post.id === postId) {
+            const liked = !post.isLiked;
+            return {
+              ...post,
+              isLiked: liked,
+              likes: post.likes + (liked ? 1 : -1),
+            };
+          }
+          return post;
+        })
+      );
+    };
 
   const handleComments = async (e, postId) => {
     e.preventDefault();
@@ -251,15 +267,15 @@ function Home() {
                     </div>
                     <div className="flex items-center gap-4">
                       <Button
-                        variant="ghost"
+                        variant={post.isLiked ? "destructive" : "ghost"}
                         size="sm"
                         onClick={(e) => {
                           e.preventDefault();
-                          handleLike(post.id);
+                          handleToggleLike(post.id);
                         }}
                         className="flex items-center gap-2"
                       >
-                        <Heart className="h-4 w-4" />
+                        <Heart className={`h-4 w-4 ${post.isLiked ? "text-red-500 fill-current" : ""}`} />
                         <span>{post.likes}</span>
                       </Button>
                       <Button
