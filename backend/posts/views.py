@@ -106,7 +106,7 @@ def fetch_posts(request):
         return JsonResponse({
             'message': 'Posts fetched successfully',
             'data' : post_data,
-        }, status=201)
+        }, status=200)
     
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON.'}, status=400)
@@ -226,8 +226,26 @@ def search_posts(request):
             'title': post.title,
             'description': post.description,
             'author': post.user.username,
-            'created_at': post.created_at.isoformat(),
-            'likes' : post.likes.count()
+        'author_id': post.user.id,
+        'authorAvatar': post.user.avatar.url if post.user.avatar else None,
+        'pitch': post.pitch,
+        'files': [att.file.url for att in post.attachments.all()],
+        'github_link': post.github_link,
+        'tech_stack': post.tech_stack,
+        'view_count': post.view_count,
+        'likes_count': post.likes.count(),
+        'comments_count': post.comments.count(),
+        'likes': post.likes.count(),
+        'comments': [
+            {
+                'id': comment.id,
+                'content': comment.content,
+                'author': comment.user.username,
+                'created_at': comment.created_at.isoformat()
+            } for comment in post.comments.all()
+        ],
+        'created_at': post.created_at.isoformat(),
+        'tags': [tag.name for tag in post.tags.all()],
         }
         for post in posts
     ]

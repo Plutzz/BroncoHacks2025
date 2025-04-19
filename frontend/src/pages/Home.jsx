@@ -73,10 +73,13 @@ function Home() {
   };
 
   // filter posts by selected tags
-  const filteredPosts = posts.filter((post) =>
-    selectedTags.length === 0 || post.tags?.some((t) => selectedTags.includes(t))
-  );
-
+  const displayPosts = searchQuery
+      ? posts
+      : posts.filter((post) =>
+          selectedTags.length === 0 ||
+          post.tags?.some((t) => selectedTags.includes(t))
+        );
+console.log("Filtered posts:", displayPosts);
   const ensureLoggedIn = async () => {
     try {
       const res = await axiosInstance.get("api/accounts/check_authentication/");
@@ -108,9 +111,6 @@ function Home() {
 
   useEffect(() => {
     loadUserProjects();
-  }, []);
-  
-  useEffect(() => {
     loadPosts();
   }, [searchQuery, location.key]);
 
@@ -159,8 +159,8 @@ function Home() {
             </Link>
           </div>
 
-          {filteredPosts.length > 0 ? (
-            filteredPosts.map((post, i) => (
+          {displayPosts.length > 0 ? (
+            displayPosts.map((post, i) => (
               <motion.div
                 key={post.id}
                 initial={{ opacity: 0, y: 20 }}
