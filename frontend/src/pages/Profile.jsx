@@ -21,7 +21,7 @@ export default function Profile() {
       linkedinUrl: ""
     });
   
-    useEffect(() => {
+    // useEffect(() => {
     //   axiosInstance
     //     .get("api/userprofile/profile-data/")
     //     .then(res => setProfile(res.data))
@@ -32,7 +32,7 @@ export default function Profile() {
       const response = await axiosInstance.post("api/accounts/logout/") 
         .catch(err => console.error("Logout failed:", err));
 
-      print(response.data);
+      console.log(response.data);
       navigate("/login");
   
     };
