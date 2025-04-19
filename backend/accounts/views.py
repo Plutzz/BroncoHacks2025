@@ -12,10 +12,14 @@ def login_view(request):
         print("REQUEST" + str(request.data))
         username = request.data.get('username')
         password = request.data.get('password')
-        print(username,password)
+        email = request.data.get('email')
+
+        print(username,password, email)
+
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
+            print("USER: ", user)
             login(request, user)
             return Response({'success': True, 'username': user.username})
         else:
