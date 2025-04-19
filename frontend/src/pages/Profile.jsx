@@ -21,12 +21,22 @@ export default function Profile() {
       linkedinUrl: ""
     });
   
-    // useEffect(() => {
-    //   axiosInstance
-    //     .get("api/userprofile/profile-data/")
-    //     .then(res => setProfile(res.data))
-    //     .catch(err => console.error("Failed to load profile:", err));
-    // }, []);
+    useEffect(() => {
+      axiosInstance
+        .get("api/userprofile/profile-data/")
+        .then(res => {
+          console.log("Profile data:", res.data);
+          setProfile({
+            name: res.data.name,
+            avatar: res.data.avatar,
+            occupation: res.data.occupation,
+            bio: res.data.bio,
+            projects: res.data.your_posts,
+            likedProjects: res.data.liked_posts
+          });
+        })
+        .catch(err => console.error("Failed to load profile:", err));
+    }, []);
 
     const handleSignOut = async () => {
       const response = await axiosInstance.post("api/accounts/logout/") 
@@ -42,8 +52,8 @@ export default function Profile() {
       avatar,
       occupation,
       bio,
-      projects,
-      likedProjects,
+      projects = [],
+      likedProjects = [],
       githubUrl,
       twitterUrl,
       linkedinUrl

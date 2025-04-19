@@ -2,31 +2,36 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from posts.models import Post, PostLike
 from posts.serializers import PostSerializer
-from .serializers import UserSerializer
+from accounts.models import CustomUser
 
 @api_view(['GET'])
 def user_profile_data(request):
     if request.user.is_authenticated:
         # Fetch liked posts
-        liked_posts = PostLike.objects.filter(user=request.user).select_related('posts')
+        liked_posts = PostLike.objects.filter(user=request.user).select_related('post')
         liked_posts_data = PostSerializer([like.post for like in liked_posts], many=True).data
 
         # Fetch user's own posts
         user_posts = Post.objects.filter(user=request.user)
         user_posts_data = PostSerializer(user_posts, many=True).data
+        
+        # Fetch user details
+        user = CustomUser.objects.get(username=request.user.username)
         user_data = {
-            'name': f"{request.user.first_name} {request.user.last_name}".strip(),
-            'avatar': request.user.avatar.url if request.user.avatar else None,
-            'occupation': request.user.occupation,
-            'bio': request.user.bio,
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'bio': user.bio,
+            'profile_picture': user.avatar if user.avatar else None,
         }
-
-        # Fetch username
-        username = request.user.username
 
         # Combine all data into a single response
         return Response({
-            'username': username,
+            'username': user_data['username'],
+            'name' : user_data['first_name'] + ' ' + user_data['last_name'],
+            'avatar': user_data['profile_picture'] if user_data['profile_picture'] else None,
+            'bio' : user_data['bio'],
             'liked_posts': liked_posts_data,
             'your_posts': user_posts_data,
             **user_data,
