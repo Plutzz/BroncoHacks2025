@@ -5,7 +5,7 @@ import json
 from .models import Post
 
 @csrf_exempt  # remove When we setup CSRF cookies
-@login_required
+# @login_required
 def create_post(request):
     if request.method == 'POST':
         try:
@@ -39,3 +39,18 @@ def create_post(request):
             return JsonResponse({'error': 'Invalid JSON.'}, status=400)
 
     return JsonResponse({'error': 'Only POST requests are allowed.'}, status=405)
+
+def fetch_posts(request):
+    if request.method == 'GET':
+        try:
+            
+            posts = Post.objects.all()
+            return JsonResponse({
+                'message': 'Posts fetched successfully',
+                'data' : posts,
+            }, status=201)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON.'}, status=400)
+
+    return JsonResponse({'error': 'Only GET requests are allowed.'}, status=405)
+    
