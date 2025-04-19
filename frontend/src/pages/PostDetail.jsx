@@ -13,6 +13,7 @@ export default function PostDetail() {
   const { toast } = useToast();
   const [post, setPost] = useState(null);
   const [comment, setComment] = useState("");
+  const [isLiked, setIsLiked] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -26,6 +27,7 @@ export default function PostDetail() {
     const found = resp.data.data.find((p) => p.id === Number(id));
     if (found) {
       setPost(found);
+      setIsLiked(found.liked_by_user ?? false);
     } else {
       setPost(null);
     }
@@ -59,12 +61,18 @@ export default function PostDetail() {
     }
   };
 
-  const handleLike = async () => {
-    if (!(await ensureLoggedIn())) return;
-    const response = await axiosInstance.post("api/posts/like/", {post_id:post.id})
-    loadDetail();
-  };
 
+  const handleToggleLike = async () => {
+      if (!(await ensureLoggedIn())) return;
+      // toggle on server
+      await axiosInstance.post("api/posts/like/", { post_id: post.id });
+      // update UI count  flag
+      setPost(prev => ({
+        ...prev,
+        likes_count: prev.likes_count + (isLiked ? -1 : 1)
+      }));
+      setIsLiked(prev => !prev);
+  };
 
   const handleComment = async (e) => {
     e.preventDefault();
@@ -255,12 +263,12 @@ export default function PostDetail() {
 
         <div className="flex items-center gap-4 border-t border-gray-700 pt-6">
           <Button
-            variant="ghost"
+            variant={isLiked ? "destructive" : "ghost"}
             size="sm"
-            onClick={handleLike}
+            onClick={handleToggleLike}
             className="flex items-center gap-2"
           >
-            <Heart className="h-4 w-4" />
+          <Heart className={`h-4 w-4 ${isLiked ? "text-red-500 fill-current" : ""}`} />
             <span>{post.likes_count || 0}</span>
           </Button>
           <Button

@@ -196,7 +196,7 @@ export default function Profile() {
           </form>
         ) : (
         <div className="relative mb-8">
-          <PencilLineIcon onClick={() => setEditing(true)} className="bsolute top-2 right-2 p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full cursor-pointer h-6 w-6"/>
+          <PencilLineIcon onClick={() => setEditing(true)} className="bsolute top-2 right-2 p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full cursor-pointer h-10 w-10"/>
           <div className="text-center mb-8">
               <img
                 className="h-32 w-32 rounded-full mx-auto mb-4"
