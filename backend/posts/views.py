@@ -175,3 +175,20 @@ def like_comment(request, comment_id):
 
     return JsonResponse({'error': 'Only POST requests are allowed.'}, status=405)
 
+@login_required
+@api_view(['DELETE'])
+def delete_comment(request, comment_id):
+    if request.method == 'DELETE':
+        try:
+            comment = Comment.objects.get(id=comment_id)
+            if comment.user == request.user:
+                comment.delete()
+                return JsonResponse({'message': 'Comment deleted successfully!'}, status=200)
+            else:
+                return JsonResponse({'error': 'You do not have permission to delete this comment.'}, status=403)
+
+        except Comment.DoesNotExist:
+            return JsonResponse({'error': 'Comment not found.'}, status=404)
+
+    return JsonResponse({'error': 'Only DELETE requests are allowed.'}, status=405)
+
