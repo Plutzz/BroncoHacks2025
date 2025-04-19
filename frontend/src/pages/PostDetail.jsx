@@ -13,10 +13,16 @@ export default function PostDetail() {
   const { toast } = useToast();
   const [post, setPost] = useState(null);
   const [comment, setComment] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+  useEffect(async () => {
+    const posts = await axiosInstance.get("api/posts/fetch_posts/");
+    console.log(posts.data.data);
+    const foundPost = posts.data.data.find((p) => p.id === Number(id));
 
-  useEffect(() => {
-    const posts = JSON.parse(localStorage.getItem("posts") || "[]");
-    const foundPost = posts.find((p) => p.id === Number(id));
+    const user = await axiosInstance.get("api/accounts/get_current_user/");
+
+    setCurrentUser(user);
+
     if (foundPost) {
       setPost(foundPost);
     }
@@ -143,7 +149,7 @@ export default function PostDetail() {
           </div>
         )}
         {/* DELETE POST IF IT IS THE SAME AUTHOR */}
-        {user?.id === post.authorId && (
+        {currentUser?.id === post.authorId && (
           <Button
             variant="destructive"
             onClick={() => {
