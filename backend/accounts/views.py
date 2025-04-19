@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from accounts.models import CustomUser
 from posts.models import Tag
+from django.http import JsonResponse
 
 @ensure_csrf_cookie
 @api_view(['POST'])
@@ -41,16 +42,14 @@ def register_view(request):
         username = request.data.get('username')
         password = request.data.get('password')
         email = request.data.get('email')
-        tags = request.data.get('tags', [])
-        
-        for tag in tags:
-            try:
-                tag_obj, created = Tag.objects.get_or_create(name=tag)
-                tags.append(tag_obj)
-            except Exception as e:
-                return Response({'success': False, 'error': str(e)}, status=400)
+        tag_names = request.data.get('tags', [])
+
         try:
             user = CustomUser.objects.create_user(username, email, password)
+            if tag_names:
+               tag_qs = Tag.objects.filter(name__in=tag_names)
+               user.tags.set(tag_qs)
+            user.save()
             login(request, user)
             return Response({'success': True})
         except Exception as e:
@@ -68,9 +67,14 @@ def check_authentication(request):
     
 @api_view(['GET'])
 def get_current_user(request):
+    if not request.user.is_authenticated:
+        # anonymous → return null payload
+        return JsonResponse({'user': None}, status=200)
     user = request.user
-    return Response({
-        'id': user.id,
-        'username': user.username,
-        'email': user.email,
-    })
+    return JsonResponse({
+        'user': {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+        }
+    }, status=200)

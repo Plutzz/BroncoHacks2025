@@ -9,7 +9,7 @@ import { useToast } from "../components/ui/use-toast";
 
 const POPULAR_TAGS = [
   "JavaScript", "React", "Node.js", "Python", "Java", "DevOps",
-  "Machine Learning", "Cloud Computing", "Cybersecurity", "Mobile Development"
+  "Machine Learning", "Cloud Computing", "Cybersecurity", "Mobile Development", "Game Development"
 ];
 
 function Home() {
@@ -24,47 +24,39 @@ function Home() {
   const searchQuery = searchParams.get('search') || '';
 
   // HELPER FUNCTIONS
-  useEffect(() => {
-    async function loadProjects() {
-      try {
-        const res = await axiosInstance.get("api/projects/my_projects/");
-        const list = Array.isArray(res.data)
-          ? res.data
-          : Array.isArray(res.data.data)
-            ? res.data.data
-            : [];
-        console.log("User Projects:", list);
-        setUserProjects(list);
-      } catch (err) {
-        console.error("Fetch projects failed:", err);
+  const loadPosts = async () => {
+    try {
+      let res;
+      if (searchQuery === "") {
+        res = await axiosInstance.get("api/posts/fetch_posts/");
+        setPosts(res.data.data || []);
+      } else {
+        res = await axiosInstance.get(
+          `/api/posts/search/?search=${encodeURIComponent(searchQuery)}`
+        );
+        setPosts(Array.isArray(res.data.results) ? res.data.results : []);
       }
+    } catch (err) {
+      console.error("Fetch posts failed:", err);
+      if (searchQuery) navigate("/home");
     }
-    loadProjects();
-  }, []);
+  };
 
-  useEffect(() => {
-    async function loadPosts() {
-      try {
-        let res;
-        if (searchQuery === "") {
-          res = await axiosInstance.get("api/posts/fetch_posts/");
-          setPosts(res.data.data || []);
-        } else {
-          res = await axiosInstance.get(
-            `/api/posts/search/?search=${encodeURIComponent(searchQuery)}`
-          );
-          console.log("fetch_posts Results:", res.data.results);
-          setPosts(Array.isArray(res.data.results) ? res.data.results : []);
-        }
-      } catch (err) {
-        console.error("Fetch posts failed:", err);
-        if (searchQuery) {
-          navigate("/home");
-        }
-      }
+  // fetch users posts
+  const loadUserProjects = async () => {
+    try {
+      const res = await axiosInstance.get("api/userprofile/fetch_user_posts/");
+      const list = Array.isArray(res.data.data)
+        ? res.data.data
+        : [];
+      console.log("My Projects:", list);
+      setUserProjects(list);
+    } catch (err) {
+      console.error("Fetch my projects failed:", err);
     }
-    loadPosts();
-  }, [searchQuery, location.key, navigate]);
+  };
+
+  
 
   // toggle tag selection
   const toggleTag = (tag) => {
@@ -112,7 +104,13 @@ function Home() {
     navigate(`/post/${postId}`);
   };
 
+  useEffect(() => {
+    loadUserProjects();
+  }, []);
   
+  useEffect(() => {
+    loadPosts();
+  }, [searchQuery, location.key]);
 
   return (
     <div className="flex gap-8 max-w-7xl mx-auto py-8">
@@ -129,6 +127,11 @@ function Home() {
             <ul className="space-y-3">
               {userProjects.map((proj) => (
                 <li key={proj.id}>
+                  <img
+                    src={avatar || "/images/default-avatar.png"}
+                    alt={`User's avatar`}
+                    className="h-6 w-6 rounded-full"
+                  />
                   <Link
                     to={`/post/${proj.id}`}
                     className="block p-3 rounded-md hover:bg-gray-700 transition-colors"

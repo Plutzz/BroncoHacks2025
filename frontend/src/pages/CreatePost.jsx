@@ -7,13 +7,9 @@ import { useToast } from "../components/ui/use-toast";
 import axiosInstance from "../AxiosConfig.js";
 
 
-const TECH_TAGS = [
+const POPULAR_TAGS = [
   "JavaScript", "React", "Node.js", "Python", "Java", "DevOps",
   "Machine Learning", "Cloud Computing", "Cybersecurity", "Mobile Development", "Game Development",
-  "Data Science", "Blockchain", "Web Development", "UI/UX Design",
-  "Database Management", "Networking", "Software Engineering", "Agile Development", "Open Source",
-  "Artificial Intelligence", "Internet of Things (IoT)", "Big Data", "Virtual Reality (VR)", "Augmented Reality (AR)",
-  "DevSecOps", "Microservices", "Serverless Architecture", "Cross-Platform Development",
 ];
 
 
@@ -32,7 +28,7 @@ function CreatePost() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await axiosInstance.post("/api/posts/create/", formData);
+    await axiosInstance.post("/api/posts/create/", formData);
 
     const newPost = {
       id: Date.now(),
@@ -59,6 +55,15 @@ function CreatePost() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const toggleTag = (tag) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.includes(tag)
+        ? prev.tags.filter(t => t !== tag)
+        : [...prev.tags, tag]
+    }));
   };
 
   return (
@@ -133,6 +138,28 @@ function CreatePost() {
             className="w-full rounded-md border border-gray-700 bg-gray-800 px-4 py-2 focus:border-blue-500 focus:outline-none"
           />
         </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">Tags</label>
+          <div className="flex flex-wrap gap-2">
+            {POPULAR_TAGS.map(tag => (
+              <button
+                type="button"
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                className={`
+                  px-3 py-1 rounded-full text-sm border
+                  ${formData.tags.includes(tag)
+                    ? "bg-blue-500 text-white border-blue-500"
+                    : "bg-gray-700 text-gray-300 border-gray-600 hover:border-gray-500"}
+                `}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
+        
         <Button type="submit" className="w-full">
           Share Project
         </Button>

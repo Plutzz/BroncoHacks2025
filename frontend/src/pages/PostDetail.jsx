@@ -14,18 +14,32 @@ export default function PostDetail() {
   const [post, setPost] = useState(null);
   const [comment, setComment] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
-  useEffect(async () => {
-    const posts = await axiosInstance.get("api/posts/fetch_posts/");
-    console.log(posts.data.data);
-    const foundPost = posts.data.data.find((p) => p.id === Number(id));
 
-    const user = await axiosInstance.get("api/accounts/get_current_user/");
+  useEffect(() => {
+    async function loadDetail() {
+      // fetch all posts, then find this one
+      const resp = await axiosInstance.get("api/posts/fetch_posts/");
+      const found = resp.data.data.find((p) => p.id === Number(id));
+      if (found) {
+        setPost(found);
+      } else {
+        setPost(null);
+      }
 
-    setCurrentUser(user);
-
-    if (foundPost) {
-      setPost(foundPost);
+      // try to fetch current user, but don’t redirect on failure
+      try {
+        const userRes = await axiosInstance.get("api/accounts/get_current_user/");
+        print("Current user:", userRes.data);
+        if (userRes == null) {
+          setCurrentUser(null);
+        } else {
+          setCurrentUser(userRes.data);
+        }
+      } catch {
+        setCurrentUser(null);
+      }
     }
+    loadDetail();
   }, [id]);
 
   const ensureLoggedIn = async () => {

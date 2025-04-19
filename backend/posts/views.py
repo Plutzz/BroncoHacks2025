@@ -46,34 +46,31 @@ def create_post(request):
 
 @api_view(['GET'])
 def fetch_posts(request):
-    if request.method == 'GET':
-        try:
-            
-            posts = Post.objects.all()
-            post_data = []
+    try:
+        posts = Post.objects.all()
+        post_data = []
 
-            for post in posts:
-                tags = post.tags.all()
-                tag_names = [tag.name for tag in tags]
+        for post in posts:
+            tags = post.tags.all()
+            tag_names = [tag.name for tag in tags]
 
-                post_data.append({
-                    'id': post.id,
-                    'title': post.title,
-                    'content': post.description,
-                    'author': post.user.username,
-                    'created_at': post.created_at.isoformat(),
-                    'tags': tag_names,
-                })
-            print(post_data)
-            return JsonResponse({
-                'message': 'Posts fetched successfully',
-                'data' : post_data,
-            }, status=201)
-        
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON.'}, status=400)
+            post_data.append({
+                'id': post.id,
+                'title': post.title,
+                'content': post.description,
+                'author': post.user.username,
+                'created_at': post.created_at.isoformat(),
+                'tags': tag_names,
+            })
 
-    return JsonResponse({'error': 'Only GET requests are allowed.'}, status=405)
+        return JsonResponse({
+            'message': 'Posts fetched successfully',
+            'data' : post_data,
+        }, status=201)
+    
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON.'}, status=400)
+
 
 @api_view(['POST'])
 @login_required
@@ -156,7 +153,14 @@ def like_post(request, post_id):
         'content': post.content,
         'likes': list(post.likes.values_list('author__id', flat=True)),
         'author': post.author.username,
-        'comments': comments
+        'comments': [
+            {
+                'id': str(comment.id),
+                'content': comment.content,
+                'author': comment.author.username,
+                'created_at': comment.created_at.isoformat()
+            } for comment in post.comments.all()
+        ],
     }
 
     return JsonResponse({
