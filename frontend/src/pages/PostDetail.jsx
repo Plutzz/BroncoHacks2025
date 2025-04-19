@@ -17,32 +17,32 @@ export default function PostDetail() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
-    async function loadDetail() {
-      // fetch all posts, then find this one
-      const resp = await axiosInstance.get("api/posts/fetch_posts/");
-      const found = resp.data.data.find((p) => p.id === Number(id));
-      if (found) {
-        setPost(found);
-      } else {
-        setPost(null);
-      }
-
-      // try to fetch current user, but don’t redirect on failure
-      try {
-        const userRes = await axiosInstance.get("api/accounts/get_current_user/");
-
-        if (userRes == null) {
-          setCurrentUser(null);
-        } else {
-          setCurrentUser(userRes.data);
-        }
-      } catch {
-        setCurrentUser(null);
-      }
-    }
     loadDetail();
   }, [id]);
 
+  async function loadDetail() {
+    // fetch all posts, then find this one
+    const resp = await axiosInstance.get("api/posts/fetch_posts/");
+    const found = resp.data.data.find((p) => p.id === Number(id));
+    if (found) {
+      setPost(found);
+    } else {
+      setPost(null);
+    }
+
+    // try to fetch current user, but don’t redirect on failure
+    try {
+      const userRes = await axiosInstance.get("api/accounts/get_current_user/");
+
+      if (userRes == null) {
+        setCurrentUser(null);
+      } else {
+        setCurrentUser(userRes.data);
+      }
+    } catch {
+      setCurrentUser(null);
+    }
+  }
   const ensureLoggedIn = async () => {
     try {
       const res = await axiosInstance.get("api/accounts/check_authentication/");
@@ -61,13 +61,8 @@ export default function PostDetail() {
 
   const handleLike = async () => {
     if (!(await ensureLoggedIn())) return;
-
-    const posts = JSON.parse(localStorage.getItem("posts") || "[]");
-    const updatedPosts = posts.map((p) =>
-      p.id === Number(id) ? { ...p, likes: (p.likes || 0) + 1 } : p
-    );
-    localStorage.setItem("posts", JSON.stringify(updatedPosts));
-    setPost((prev) => ({ ...prev, likes: (prev.likes || 0) + 1 }));
+    const response = await axiosInstance.post("api/posts/like/", {post_id:post.id})
+    loadDetail();
   };
 
 
@@ -193,7 +188,6 @@ export default function PostDetail() {
         ))}
         {currentUser?.user.id === post.author_id && (
           <>
-
             <Trash
               variant="destructive"
               onClick={() => setShowDeleteDialog(true)}

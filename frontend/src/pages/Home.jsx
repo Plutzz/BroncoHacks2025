@@ -169,7 +169,6 @@ function Home() {
                 className="bg-gray-800 rounded-lg p-6 hover:shadow-xl transition-all hover:scale-[1.02]">
                 <Link to={`/post/${post.id}`} className="block" onClick={async (e) => {
                   await axiosInstance.post("api/posts/view_post/", {post_id:post.id});
-                  navigate(`/post/${post.id}`);
                 }
         
                   }>
