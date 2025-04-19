@@ -13,21 +13,17 @@ def login_view(request):
         print("REQUEST" + str(request.data))
         username = request.data.get('username')
         password = request.data.get('password')
-        email = request.data.get('email')
-
-        print(username,password, email)
 
         user = authenticate(request, username=username, password=password)
-        
+
         if user is not None:
-            print("USER: ", user)
             login(request, user)
             return Response({'success': True, 'username': user.username})
         else:
             return Response({'success': False, 'error': 'Invalid credentials'}, status=401)
     
     # For GET requests, render the login template
-    return render(request, 'accounts/login.html')
+    return render(request, '')
 
 @api_view(['POST'])
 def logout_view(request):

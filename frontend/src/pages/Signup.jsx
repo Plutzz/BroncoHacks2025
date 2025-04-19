@@ -16,7 +16,7 @@ function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Implement signup logic here
+    // TODO: Implement signup logic here
 
     const response = await axiosInstance.post('api/accounts/register/', 
       {

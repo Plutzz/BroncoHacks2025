@@ -1,30 +1,42 @@
 
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import axiosInstance from "../AxiosConfig.js";
+import { useToast } from "../components/ui/use-toast";
 
 function Login() {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Implement login logic here
-    const response = await axiosInstance.post('api/accounts/login/', 
-      {
-        username: "Ben",
-        email: formData.email,
-        password: formData.password,
+    try {
+      const res = await axiosInstance.post("/api/accounts/login/", formData);
+      if (res.data.success) {
+        // on success, go to home
+        navigate("/");
+      } else {
+        // on failure, show notification
+        toast({
+          title: "Login failed",
+          description: res.data.error || "Invalid credentials",
+          variant: "destructive",
+        });
       }
-    );
-
-    console.log("Login attempt:", formData);
-    console.log("Response:", response);
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: err.response?.data?.error || "Something went wrong",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

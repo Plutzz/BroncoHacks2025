@@ -12,6 +12,7 @@ class Post(models.Model):
 
     title = models.CharField(max_length=255)
     pitch = models.TextField()
+    view_count = models.IntegerField(default=0)  # number of views
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     
