@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import { useToast } from "../components/ui/use-toast";
+import axiosInstance from "../AxiosConfig.js";
 
 function CreatePost() {
   const navigate = useNavigate();
@@ -13,10 +14,14 @@ function CreatePost() {
     description: "",
     techStack: "",
     githubLink: "",
+    pitch:"",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const res = await axiosInstance.post("/api/posts/create/", formData);
+
     const newPost = {
       id: Date.now(),
       ...formData,
@@ -60,6 +65,19 @@ function CreatePost() {
             type="text"
             name="title"
             value={formData.title}
+            onChange={handleChange}
+            required
+            className="w-full rounded-md border border-gray-700 bg-gray-800 px-4 py-2 focus:border-blue-500 focus:outline-none"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Two Sentence Pitch
+          </label>
+          <input
+            type="text"
+            name="pitch"
+            value={formData.pitch}
             onChange={handleChange}
             required
             className="w-full rounded-md border border-gray-700 bg-gray-800 px-4 py-2 focus:border-blue-500 focus:outline-none"

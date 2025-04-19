@@ -6,15 +6,15 @@ import json
 from .models import Post, Comment, PostLike
 
 @api_view(['POST'])
-@csrf_exempt
 def create_post(request):
     if request.method == 'POST':
         try:
-            data = json.loads(request.body)
+            data = request.data
 
             title = data.get('title')
             pitch = data.get('pitch')
-            description = data.get('content')
+            techStack = data.get('techStack')
+            description = data.get('description')
 
             if not title or not description or not pitch:
                 return JsonResponse({'error': 'Missing title or content.'}, status=400)
@@ -23,7 +23,8 @@ def create_post(request):
                 user=request.user,
                 title=title,
                 pitch=pitch,
-                content=description,
+                description=description,
+                tech_stack = techStack,
             )
 
             return JsonResponse({
@@ -31,7 +32,7 @@ def create_post(request):
                 'post': {
                     'id': post.id,
                     'title': post.title,
-                    'content': post.content,
+                    'content': post.description,
                     'created_at': post.created_at.isoformat()
                 }
             }, status=201)
