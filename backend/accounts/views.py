@@ -58,3 +58,12 @@ def check_authentication(request):
         return Response({'authenticated': True, 'username': request.user.username})
     else:
         return Response({'authenticated': False})
+    
+@api_view(['GET'])
+def get_current_user(request):
+    user = request.user
+    return Response({
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+    })

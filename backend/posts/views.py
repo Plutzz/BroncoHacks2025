@@ -1,9 +1,11 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.db.models import Q
 from rest_framework.decorators import api_view
 import json
 from .models import Post, Comment, PostLike
+from django.shortcuts import get_object_or_404
 
 @api_view(['POST'])
 def create_post(request):
@@ -72,15 +74,50 @@ def fetch_posts(request):
             return JsonResponse({'error': 'Invalid JSON.'}, status=400)
 
     return JsonResponse({'error': 'Only GET requests are allowed.'}, status=405)
-    
 
+@api_view(['POST'])
+@login_required
+def delete_post(request):
+    print("REQUEST")
+    data = request.data
+    print(data)
+    post_id = data.get('id')
+    print(post_id)
+    post = get_object_or_404(Post, id=post_id)
+
+    if post.user != request.user:
+        return JsonResponse({'error': 'You do not have permission to delete this post.'}, status=403)
+
+    post.delete()
+    return JsonResponse({'message': 'Post deleted successfully'})
+
+@api_view(['GET'])
+def search_posts(request):
+    query = request.GET.get('search', '')
+
+    posts = Post.objects.filter(
+        Q(title__icontains=query) |
+        Q(description__icontains=query)
+    ).order_by('-created_at')
+
+    posts_data = [
+        {
+            'id': post.id,
+            'title': post.title,
+            'description': post.description,
+            'author': post.user.username,
+            'created_at': post.created_at.isoformat(),
+        }
+        for post in posts
+    ]
+
+    return JsonResponse({'results': posts_data})
 
 # =======================
 #      Like Post
 # =======================
 
 @api_view(['POST'])
-# @login_required
 def like_post(request, post_id):
     try:
         data = request.data or json.loads(request.body)

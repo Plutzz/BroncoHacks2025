@@ -13,10 +13,16 @@ export default function PostDetail() {
   const { toast } = useToast();
   const [post, setPost] = useState(null);
   const [comment, setComment] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+  useEffect(async () => {
+    const posts = await axiosInstance.get("api/posts/fetch_posts/");
+    console.log(posts.data.data);
+    const foundPost = posts.data.data.find((p) => p.id === Number(id));
 
-  useEffect(() => {
-    const posts = JSON.parse(localStorage.getItem("posts") || "[]");
-    const foundPost = posts.find((p) => p.id === Number(id));
+    const user = await axiosInstance.get("api/accounts/get_current_user/");
+
+    setCurrentUser(user);
+
     if (foundPost) {
       setPost(foundPost);
     }
@@ -143,17 +149,20 @@ export default function PostDetail() {
           </div>
         )}
         {/* DELETE POST IF IT IS THE SAME AUTHOR */}
-        {user?.id === post.authorId && (
+        {currentUser?.id === post.authorId && (
           <Button
+          
             variant="destructive"
-            onClick={() => {
-              const posts = JSON.parse(localStorage.getItem("posts") || "[]");
-              const updatedPosts = posts.filter(p => p.id !== id);
-              localStorage.setItem("posts", JSON.stringify(updatedPosts));
-              toast({
+            onClick={async () => {
+              console.log("postID", post.id)
+              const response = await axiosInstance.post('api/posts/delete_post/', 
+                {
+                  id: post.id,
+                }
+              ).then(toast({
                 title: "Success",
                 description: "Post deleted successfully."
-              });
+              }));
               navigate("/");
             }}
           >

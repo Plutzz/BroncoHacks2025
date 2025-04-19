@@ -36,6 +36,7 @@ function Navbar() {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    navigate(`/?search=${encodeURIComponent(searchQuery)}`);
     // Implement search functionality here
     console.log("Searching for:", searchQuery);
   };

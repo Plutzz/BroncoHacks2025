@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Heart, MessageCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import axiosInstance from "../AxiosConfig.js";
 import { useToast } from "../components/ui/use-toast";
 
@@ -11,6 +11,8 @@ function Home() {
   const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
   // HELPER FUNCTIONS
   const ensureLoggedIn = async () => {
     try {
@@ -31,14 +33,27 @@ function Home() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await axiosInstance.get("api/posts/fetch_posts/");
-        setPosts(res.data.data);
+        if(searchQuery==='')
+        {
+          console.log("NO SEARCH QUERY", searchQuery)
+          const res = await axiosInstance.get("api/posts/fetch_posts/");
+          console.log(res.data.data)
+          setPosts(res.data.data);
+        }
+        else
+        {
+          console.log("SEARCH QUERY", searchQuery)
+          const res = await axiosInstance.get(`/api/posts/search/?search=${encodeURIComponent(searchQuery)}`);
+          console.log(res.data.results)
+          setPosts(res.data.results);
+        }
+        
       } catch (err) {
         console.error("Fetch posts failed:", err);
       }
     }
     load();
-  }, []);
+  }, [searchQuery]);
 
   const handleLike = async (postId) => {
     if (!(await ensureLoggedIn())) return;
