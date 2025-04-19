@@ -6,13 +6,7 @@ import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import axiosInstance from "../AxiosConfig.js";
-
-
-const TECH_TAGS = [
-  "JavaScript", "React", "Node.js", "Python", "Java", "DevOps",
-  "Machine Learning", "Cloud Computing", "Cybersecurity", "Mobile Development", "Game Development",
-  "Data Science", "Blockchain", "Web Development", "UI/UX Design",
-];
+import TECH_TAGS from "../Tags.js";
 
 const passwordRequirements = [
   { label: "At least 8 characters", test: (password) => password.length >= 8 },

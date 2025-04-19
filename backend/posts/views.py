@@ -87,6 +87,7 @@ def fetch_posts(request):
                 'tech_stack': post.tech_stack,
                 'view_count': post.view_count,
                 'likes_count': post.likes.count(),
+                'isLiked' : post.likes.filter(id=request.user.id).exists(),
                 'comments_count': post.comments.count(),
                 'likes': post.likes.count(),
                 'comments': [

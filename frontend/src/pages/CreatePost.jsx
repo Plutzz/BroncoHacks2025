@@ -5,13 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import { useToast } from "../components/ui/use-toast";
 import axiosInstance from "../AxiosConfig.js";
-
-
-const POPULAR_TAGS = [
-  "JavaScript", "React", "Node.js", "Python", "Java", "DevOps",
-  "Machine Learning", "Cloud Computing", "Cybersecurity", "Mobile Development", "Game Development",
-];
-
+import TECH_TAGS from "../Tags.js";
 
 function CreatePost() {
   const navigate = useNavigate();
@@ -156,7 +150,7 @@ function CreatePost() {
         <div>
           <label className="block text-sm font-medium mb-2">Tags</label>
           <div className="flex flex-wrap gap-2">
-            {POPULAR_TAGS.map(tag => (
+            {TECH_TAGS.map(tag => (
               <button
                 type="button"
                 key={tag}

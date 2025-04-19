@@ -5,14 +5,9 @@ import { Button } from "../components/ui/button";
 import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import axiosInstance from "../AxiosConfig.js";
 import { useToast } from "../components/ui/use-toast";
-
-const POPULAR_TAGS = [
-  "JavaScript", "React", "Node.js", "Python", "Java", "DevOps",
-  "Machine Learning", "Cloud Computing", "Cybersecurity", "Mobile Development", "Game Development"
-];
-
+import TECH_TAGS from "../Tags.js";
 function Home() {
-  const tags = POPULAR_TAGS;
+  const tags = TECH_TAGS;
   const [posts, setPosts] = useState([]);
   const [userProjects, setUserProjects] = useState([]);
   const [analytics, setAnalytics] = useState(null);
@@ -43,6 +38,7 @@ function Home() {
         isLiked: p.liked_by_user ?? false
       }));
       setPosts(enriched);
+      console.log("POSTS", raw);
     } catch (err) {
       console.error("Fetch posts failed:", err);
       if (searchQuery) navigate("/home");
@@ -101,10 +97,11 @@ function Home() {
   const handleToggleLike = async (postId) => {
       if (!(await ensureLoggedIn())) return;
       // toggle on the server
-      await axiosInstance.post("api/posts/like/", { post_id: postId });
+      response = await axiosInstance.post("api/posts/like/", { post_id: postId });
       // update UI: flip isLiked and adjust count
       setPosts(prev =>
         prev.map(post => {
+          console.log("get post", post)
           if (post.id === postId) {
             const liked = !post.isLiked;
             return {
