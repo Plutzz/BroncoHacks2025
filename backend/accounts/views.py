@@ -50,3 +50,10 @@ def register_view(request):
     
     return render(request, 'accounts/register.html')
 
+@api_view(['GET'])
+def check_authentication(request):
+    print(request.user, request.user.is_authenticated)
+    if request.user.is_authenticated:
+        return Response({'authenticated': True, 'username': request.user.username})
+    else:
+        return Response({'authenticated': False})
