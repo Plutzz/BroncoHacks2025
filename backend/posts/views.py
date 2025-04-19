@@ -260,6 +260,25 @@ def toggle_like(request):
 
     return JsonResponse({'liked': True, 'message': 'Post liked'}, status=200)
 
+
+@api_view(['POST'])
+def view_post(request):
+    post_id = request.data.get('post_id')
+    user = request.user
+
+    if not post_id:
+        return JsonResponse({'error': 'post_id is required'}, status=400)
+
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return JsonResponse({'error': 'Post not found'}, status=404)
+
+    post.view_count+=1
+    post.save(update_fields=["view_count"])
+    return JsonResponse({'viewed': True, 'message': 'Post viewed'}, status=200)
+
+
 # =======================
 #      Comment Post
 # =======================
@@ -355,3 +374,4 @@ def fetch_comments(request):
         'message': 'Comments fetched successfully',
         'data': serializer.data
     }, status=200)
+

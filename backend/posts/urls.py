@@ -13,4 +13,5 @@ urlpatterns = [
     path('fetch_comments/', views.fetch_comments, name='fetch_comment'),
     path('<int:id>/update/', views.update_post, name='update_post'),
     path('<int:id>/', views.get_post, name='get_post'),
+    path('view_post/', views.view_post, name='view_post'),
 ]

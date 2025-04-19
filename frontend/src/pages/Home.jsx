@@ -160,7 +160,12 @@ function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 className="bg-gray-800 rounded-lg p-6 hover:shadow-xl transition-all hover:scale-[1.02]">
-                <Link to={`/post/${post.id}`} className="block">
+                <Link to={`/post/${post.id}`} className="block" onClick={async (e) => {
+                  await axiosInstance.post("api/posts/view_post/", {post_id:post.id});
+                  navigate(`/post/${post.id}`);
+                }
+        
+                  }>
 
                   <div className="flex items-center gap-3 mb-4">
                     <img
