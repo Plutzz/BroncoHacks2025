@@ -144,48 +144,41 @@ export default function PostDetail() {
           ))}
         </p>
         {/* Add images/documents */}
-        {post.files && (
-          (() => {
-            const files = Array.isArray(post.files)
-              ? post.files
-              : [post.files];
-            if (!files.length) return null;
-            return (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-2">Attachments</h3>
-                    <div className="flex flex-wrap gap-4">
-                      {post.files.map((fileUrl, idx) =>
-                        /\.(jpe?g|png|gif)$/i.test(fileUrl) ? (
-                          <img
-                            key={idx}
-                            src={fileUrl}
-                            alt={`attachment-${idx}`}
-                            className="max-h-48 rounded border border-gray-600"
-                          />
-                        ) : /\.(mp4|webm|ogg)$/i.test(fileUrl) ? (
-                          <video
-                            key={idx}
-                            src={fileUrl}
-                            controls
-                            className="max-h-60 rounded border border-gray-600"
-                          />
-                        ) : (
-                          <a
-                            key={idx}
-                            href={fileUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-400 hover:underline"
-                          >
-                            {fileUrl.split("/").pop()}
-                          </a>
-                        )
-                      )}
-                    </div>
-                  </div>
-            );
-          }
-        ))}
+        {Array.isArray(post.files) && post.files.length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-2">Attachments</h3>
+          <div className="flex flex-wrap gap-4">
+            {post.files.map((fileUrl, idx) =>
+              /\.(jpe?g|png|gif)$/i.test(fileUrl) ? (
+                <img
+                  key={idx}
+                  src={fileUrl}
+                  alt={`attachment-${idx}`}
+                  className="max-h-48 rounded border border-gray-600"
+                />
+              ) : /\.(mp4|webm|ogg)$/i.test(fileUrl) ? (
+                <video
+                  key={idx}
+                  src={fileUrl}
+                  controls
+                  className="max-h-60 rounded border border-gray-600"
+                />
+              ) : (
+                <a
+                  key={idx}
+                  href={fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:underline"
+                >
+                  {fileUrl.split("/").pop()}
+                </a>
+              )
+            )}
+          </div>
+        </div>
+      )}
+
         {currentUser?.user.id === post.author_id && (
           <>
             <Trash
