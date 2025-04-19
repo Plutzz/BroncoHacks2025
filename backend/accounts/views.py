@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from .models import CustomUser
 
 
 @ensure_csrf_cookie
@@ -30,7 +31,7 @@ def logout_view(request):
     return Response({'success': True})
 
 # Optional: Registration view
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 def register_view(request):
     if request.method == 'POST':
         # Handle registration logic
@@ -41,7 +42,7 @@ def register_view(request):
         email = request.data.get('email', '')
         
         try:
-            user = User.objects.create_user(username, email, password)
+            user = CustomUser.objects.create_user(username, email, password)
             login(request, user)
             return Response({'success': True})
         except Exception as e:
@@ -49,4 +50,3 @@ def register_view(request):
     
     return render(request, 'accounts/register.html')
 
-# Create your views here.

@@ -2,13 +2,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
-from rest_framework.permissions import IsAuthenticated
 import json
 from .models import Post, Comment, PostLike
 
-@csrf_exempt  # remove When we setup CSRF cookies
-# @login_required
 @api_view(['POST'])
+@csrf_exempt
 def create_post(request):
     if request.method == 'POST':
         try:
@@ -65,9 +63,8 @@ def fetch_posts(request):
 # =======================
 
 @api_view(['POST'])
-@login_required
+# @login_required
 def like_post(request, post_id):
-    # parse payload
     try:
         data = request.data or json.loads(request.body)
     except ValueError:
@@ -78,8 +75,8 @@ def like_post(request, post_id):
     # validations
     if not userID:
         return JsonResponse({'message': 'userID was not provided', 'status': 400}, status=400)
-    if len(post_id) != 24 or len(userID) != 24:
-        return JsonResponse({'message': 'Post or User ID must be 24 char long', 'status': 400}, status=400)
+    # if len(post_id) != 24 or len(userID) != 24:
+    #     return JsonResponse({'message': 'Post or User ID must be 24 char long', 'status': 400}, status=400)
 
     # fetch post with related author/comments
     post = get_object_or_404(
@@ -113,3 +110,68 @@ def like_post(request, post_id):
         'status': 200,
         'newPost': new_post
     }, status=200)
+
+# =======================
+#      Comment Post
+# =======================
+
+@login_required
+@api_view(['POST'])
+def create_comment(request, post_id):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+
+            content = data.get('content')
+
+            if not content:
+                return JsonResponse({'error': 'Missing content.'}, status=400)
+
+            post = Post.objects.get(id=post_id)
+            comment = Comment.objects.create(
+                user=request.user,
+                post=post,
+                content=content,
+            )
+
+            return JsonResponse({
+                'message': 'Comment created successfully!',
+                'comment': {
+                    'id': comment.id,
+                    'content': comment.content,
+                    'created_at': comment.created_at.isoformat()
+                }
+            }, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON.'}, status=400)
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found.'}, status=404)
+
+    return JsonResponse({'error': 'Only POST requests are allowed.'}, status=405)
+
+
+@login_required
+@api_view(['POST'])
+def like_comment(request, comment_id):
+    if request.method == 'POST':
+        try:
+            comment = Comment.objects.get(id=comment_id)
+            if request.user in comment.likes.all():
+                comment.likes.remove(request.user)
+                liked = False
+            else:
+                comment.likes.add(request.user)
+                liked = True
+
+            return JsonResponse({
+                'message': 'Comment liked successfully!',
+                'liked': liked,
+                'likes_count': comment.likes.count()
+            }, status=200)
+
+        except Comment.DoesNotExist:
+            return JsonResponse({'error': 'Comment not found.'}, status=404)
+
+    return JsonResponse({'error': 'Only POST requests are allowed.'}, status=405)
+

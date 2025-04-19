@@ -8,7 +8,7 @@ import axiosInstance from "../AxiosConfig.js";
 
 function Login() {
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
   });
 
@@ -40,10 +40,10 @@ function Login() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Input
-            type="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            type="username"
+            placeholder="Username"
+            value={formData.username}
+            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
             required
           />
         </div>
