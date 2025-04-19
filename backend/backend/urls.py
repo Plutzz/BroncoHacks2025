@@ -42,17 +42,15 @@ if settings.DEBUG:
         '/assets/',
         document_root=str(settings.FRONTEND_DIST / 'assets')
     )
+    
+    urlpatterns += static(
+        '/images/',
+        document_root=str(settings.FRONTEND_DIST / 'images')
+    )
 
-    urlpatterns += [
-        path('vite.svg',
-             serve,
-             {'path': 'vite.svg', 'document_root': settings.FRONTEND_DIST},
-             name='vite-svg'),
-    ]
-    
-    
+
 urlpatterns += [
-    re_path(r'^(?!admin/|TestApp/|assets/|static/|vite\.svg$).*$', 
+    re_path(r'^(?!admin/|TestApp/|assets/|images/|static/|vite\.svg$).*$', 
             TemplateView.as_view(template_name='index.html'),
             name='spa-fallback'),
 ]

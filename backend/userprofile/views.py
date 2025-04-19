@@ -14,6 +14,12 @@ def user_profile_data(request):
         # Fetch user's own posts
         user_posts = Post.objects.filter(user=request.user)
         user_posts_data = PostSerializer(user_posts, many=True).data
+        user_data = {
+            'name': f"{request.user.first_name} {request.user.last_name}".strip(),
+            'avatar': request.user.avatar.url if request.user.avatar else None,
+            'occupation': request.user.occupation,
+            'bio': request.user.bio,
+        }
 
         # Fetch username
         username = request.user.username
@@ -23,6 +29,7 @@ def user_profile_data(request):
             'username': username,
             'liked_posts': liked_posts_data,
             'your_posts': user_posts_data,
+            **user_data,
         })
 
     return Response({'error': 'Unauthorized'}, status=401)
