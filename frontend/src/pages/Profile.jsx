@@ -55,21 +55,7 @@ export default function Profile() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-2xl mx-auto"
       >
-      <div className="flex justify-end mb-6">
-        <Button variant="destructive" onClick={handleSignOut}>
-          Log Out
-        </Button>
-      </div>
 
-      <div className="text-center mb-8">
-        <img
-          className="h-32 w-32 rounded-full mx-auto mb-4"
-          src={avatar || "/images/default-avatar.png"}
-          alt={`${name}'s avatar`}
-        />
-        <h1 className="text-3xl font-bold">{name || "Your Name"}</h1>
-        <p className="text-gray-400">{occupation || "Your Occupation"}</p>
-      </div>
         <div className="text-center mb-8">
           <img
             className="h-32 w-32 rounded-full mx-auto mb-4"
@@ -122,6 +108,11 @@ export default function Profile() {
             </Button>
           )}
         </div>
+        <div className="flex justify-end mb-6">
+        <Button variant="destructive" onClick={handleSignOut}>
+          Log Out
+        </Button>
+      </div>
       </motion.div>
     );
 }
