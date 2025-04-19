@@ -69,35 +69,24 @@ export default function PostDetail() {
     setPost((prev) => ({ ...prev, likes: (prev.likes || 0) + 1 }));
   };
 
+
   const handleComment = async (e) => {
     e.preventDefault();
     if (!(await ensureLoggedIn())) return;
     if (!comment.trim()) return;
 
     const newComment = {
-      id: Date.now(),
+      post_id: post.id,
       text: comment,
-      author: "Anonymous User",
-      date: new Date().toLocaleDateString(),
     };
 
-    const posts = JSON.parse(localStorage.getItem("posts") || "[]");
-    const updatedPosts = posts.map((p) =>
-      p.id === Number(id)
-        ? { ...p, comments: [...(p.comments || []), newComment] }
-        : p
-    );
-    localStorage.setItem("posts", JSON.stringify(updatedPosts));
-    setPost((prev) => ({
-      ...prev,
-      comments: [...(prev.comments || []), newComment],
-    }));
-    setComment("");
-    
+    const response = await axiosInstance.post("/api/posts/comment/", newComment);
+    console.log(response);
     toast({
       title: "Comment added",
       description: "Your comment has been posted successfully.",
     });
+    window.location.reload();
   };
 
   if (!post) {
@@ -249,7 +238,7 @@ export default function PostDetail() {
                     {comment.date}
                   </span>
                 </div>
-                <p className="text-gray-300">{comment.text}</p>
+                <p className="text-gray-300">{comment.content}</p>
               </div>
             ))}
           </div>

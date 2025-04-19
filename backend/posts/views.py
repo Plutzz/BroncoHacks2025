@@ -5,6 +5,7 @@ from django.db.models import Q
 from rest_framework.decorators import api_view
 import json
 from .models import Post, Comment, PostLike, Tag
+from .serializers import CommentSerializer
 from django.shortcuts import get_object_or_404
 
 @api_view(['POST'])
@@ -211,12 +212,12 @@ def like_post(request, post_id):
 
 @login_required
 @api_view(['POST'])
-def create_comment(request, post_id):
+def create_comment(request):
     if request.method == 'POST':
         try:
-            data = json.loads(request.body)
-
-            content = data.get('content')
+            print("Trying to get comment", request.data)
+            content = request.data.get('text')
+            post_id = request.data.get('post_id')
 
             if not content:
                 return JsonResponse({'error': 'Missing content.'}, status=400)
@@ -286,3 +287,17 @@ def delete_comment(request, comment_id):
 
     return JsonResponse({'error': 'Only DELETE requests are allowed.'}, status=405)
 
+@api_view(['GET'])
+def fetch_comments(request):
+    post_id = request.GET.get('post_id')
+
+    if not post_id:
+        return JsonResponse({'error': 'post_id is required'}, status=400)
+
+    comments = Comment.objects.filter(post_id=post_id).order_by('-created_at')
+    serializer = CommentSerializer(comments, many=True)
+
+    return JsonResponse({
+        'message': 'Comments fetched successfully',
+        'data': serializer.data
+    }, status=200)

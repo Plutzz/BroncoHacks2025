@@ -9,4 +9,6 @@ urlpatterns = [
     path('fetch_posts/', views.fetch_posts, name='fetch_posts'),
     path('delete_post/', views.delete_post, name='delete_post'),
     path('search/', views.search_posts, name='search_posts'),
+    path('comment/', views.create_comment, name='comment'),
+    path('fetch_comments/', views.fetch_comments, name='fetch_comment'),
 ]
