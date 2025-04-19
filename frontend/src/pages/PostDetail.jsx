@@ -151,15 +151,18 @@ export default function PostDetail() {
         {/* DELETE POST IF IT IS THE SAME AUTHOR */}
         {currentUser?.id === post.authorId && (
           <Button
+          
             variant="destructive"
-            onClick={() => {
-              const posts = JSON.parse(localStorage.getItem("posts") || "[]");
-              const updatedPosts = posts.filter(p => p.id !== id);
-              localStorage.setItem("posts", JSON.stringify(updatedPosts));
-              toast({
+            onClick={async () => {
+              console.log("postID", post.id)
+              const response = await axiosInstance.post('api/posts/delete_post/', 
+                {
+                  id: post.id,
+                }
+              ).then(toast({
                 title: "Success",
                 description: "Post deleted successfully."
-              });
+              }));
               navigate("/");
             }}
           >
