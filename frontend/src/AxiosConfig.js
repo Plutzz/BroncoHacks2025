@@ -1,8 +1,8 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-// FOR BASE URL: USE 'http://localhost:8000' DURING DEVELOPMENT AND USE https://ec2-23-20-205-143.compute-1.amazonaws.com DURING PRODUCTION
+// FOR BASE URL: USE 'http://localhost:8000'
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: 'http://127.0.0.1:8000/',
   withCredentials: true,  // Important to include cookies (sessionid & csrftoken)
   xsrfCookieName: 'csrftoken',
   xsrfHeaderName: 'X-CSRFToken'

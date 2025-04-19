@@ -6,9 +6,10 @@ from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 
 
 @ensure_csrf_cookie
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 def login_view(request):
     if request.method == 'POST':
+        print("REQUEST" + str(request.data))
         username = request.data.get('username')
         password = request.data.get('password')
         

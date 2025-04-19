@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import axiosInstance from "../AxiosConfig.js";
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -11,10 +12,18 @@ function Login() {
     password: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Implement login logic here
+    response = await axiosInstance.post('api/accounts/login/', 
+      {
+        username: "testusername",
+        password: "testpassword123",
+      }
+    );
+
     console.log("Login attempt:", formData);
+    console.log("Response:", response);
   };
 
   return (
