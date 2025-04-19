@@ -14,6 +14,14 @@ const TECH_TAGS = [
   "Data Science", "Blockchain", "Web Development", "UI/UX Design",
 ];
 
+const passwordRequirements = [
+  { label: "At least 8 characters", test: (password) => password.length >= 8 },
+  { label: "At least one uppercase letter", test: (password) => /[A-Z]/.test(password) },
+  { label: "At least one lowercase letter", test: (password) => /[a-z]/.test(password) },
+  { label: "At least one number", test: (password) => /\d/.test(password) },
+  { label: "At least one special character (!@#$%^&*)", test: (password) => /[!@#$%^&*]/.test(password) },
+];
+
 function Signup() {
   const [formData, setFormData] = useState({
     username: "",
@@ -23,9 +31,21 @@ function Signup() {
     selectedTags: [],
   });
 
+  const [passwordValidation, setPasswordValidation] = useState(
+    passwordRequirements.map(() => false)
+  );
+
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const handlePasswordChange = (e) => {
+    const password = e.target.value;
+    setFormData({ ...formData, password });
+
+    // Validate password against requirements
+    const validationResults = passwordRequirements.map((req) => req.test(password));
+    setPasswordValidation(validationResults);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,6 +53,12 @@ function Signup() {
     // Check if passwords match
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
+      return;
+    }
+
+    // Check if all password requirements are met
+    if (passwordValidation.includes(false)) {
+      alert("Password does not meet all requirements!");
       return;
     }
 
@@ -112,10 +138,20 @@ function Signup() {
             type="password"
             placeholder="Password"
             value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            onChange={handlePasswordChange}
             required
           />
         </div>
+        <ul className="text-gray-500 text-sm mt-2">
+          {passwordRequirements.map((req, index) => (
+            <li
+              key={index}
+              className={passwordValidation[index] ? "text-green-500" : "text-red-500"}
+            >
+              {req.label}
+            </li>
+          ))}
+        </ul>
           {formData.password && (
             <div>
               <Input
