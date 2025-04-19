@@ -8,7 +8,7 @@ import { Home, User, PlusCircle, Search } from "lucide-react";
 import axiosInstance from "../AxiosConfig.js";
 
 function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // This will be replaced with actual auth state
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {

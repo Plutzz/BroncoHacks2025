@@ -16,19 +16,42 @@ function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement signup logic here
 
-    const response = await axiosInstance.post('api/accounts/register/', 
-      {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
+    // Check if passwords match
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    // Send signup request
+    try {
+
+      const response = await axiosInstance.post('api/accounts/register/', 
+        {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        }
+      );
+
+      console.log("Signup attempt:", formData);
+      console.log("Response:", response);
+
+      if (response.data.success) {
+        navigate("/");
+      } else {
+        toast({
+          title: "Sign Up failed",
+          description: res.data.error,
+          variant: "destructive",
+        });
       }
-    );
 
-    console.log("Signup attempt:", formData);
-    console.log("Response:", response);
-  };
+    } catch (error) {
+      console.error("Error during signup:", error);
+      alert("Signup failed. Please try again.");
+    }
+};
 
   return (
     <motion.div
@@ -69,15 +92,19 @@ function Signup() {
             required
           />
         </div>
-        <div>
-          <Input
-            type="password"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-            required
-          />
-        </div>
+          {formData.password && (
+            <div>
+              <Input
+                type="password"
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={(e) =>
+                  setFormData({ ...formData, confirmPassword: e.target.value })
+                }
+                required
+              />
+            </div>
+          )}
         <Button type="submit" className="w-full">
           Sign up
         </Button>
