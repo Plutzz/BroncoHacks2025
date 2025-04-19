@@ -20,6 +20,7 @@ export default function Profile() {
       name: "",
       avatar: "",
       occupation: "",
+      email: "",
       bio: "",
       projects: [],
       likedProjects: [],
@@ -34,6 +35,7 @@ export default function Profile() {
       name : "",
       occupation : "",
       bio : "",
+      email : "",
       avatar : "",
       tags : [],
     })
@@ -48,6 +50,7 @@ export default function Profile() {
             avatar: res.data.avatar,
             occupation: res.data.occupation,
             bio: res.data.bio,
+            email: res.data.email,
             tags: res.data.tags,
             projects: res.data.your_posts,
             likedProjects: res.data.liked_posts
@@ -57,6 +60,7 @@ export default function Profile() {
             occupation: res.data.occupation,
             bio: res.data.bio,
             avatar: res.data.avatar,
+            email: res.data.email,
             tags: res.data.tags,
           });
         })
@@ -96,6 +100,7 @@ export default function Profile() {
           fd.append('username', formData.name);
           fd.append('occupation', formData.occupation);
           fd.append('bio', formData.bio);
+          fd.append('email', formData.email);
           formData.tags.forEach(t => fd.append('tags', t));
           if (fileRef.current.files[0]) {
             fd.append('avatar', fileRef.current.files[0]);
@@ -135,28 +140,41 @@ export default function Profile() {
           <form onSubmit={handleProfileUpdate} encType="multipart/form-data" className="bg-gray-800/50 rounded-lg border border-gray-700 p-6 mb-8">
             <input
               name="name"
+              placeholder="Username"
               value={formData.name}
               onChange={handleInputChange}
               className="w-full mb-4 rounded-md border border-gray-700 bg-gray-800 px-3 py-2"
             />
             <input
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className="w-full mb-4 rounded-md border border-gray-700 bg-gray-800 px-3 py-2"
+            />
+            <input
               name="occupation"
+              placeholder="Occupation"
               value={formData.occupation}
               onChange={handleInputChange}
               className="w-full mb-4 rounded-md border border-gray-700 bg-gray-800 px-3 py-2"
             />
             <textarea
               name="bio"
+              placeholder="Tell us a bit about yourself."
               value={formData.bio}
               onChange={handleInputChange}
               rows={3}
               className="w-full mb-4 rounded-md border border-gray-700 bg-gray-800 px-3 py-2"
             />
-            <input
-              type="file"
-              ref={fileRef}
-              accept="image/*"
-            />
+            <div className="block mb-2 text-center mt-4">
+              <label className="block mb-2">Upload Your Avatar</label>
+              <input
+                type="file"
+                ref={fileRef}
+                accept="image/*"
+              />
+            </div>
             <div>
               <label className="block mb-2 text-center mt-4">Select Your Interests</label>
               <div className="flex flex-wrap gap-2 justify-center">
@@ -164,7 +182,7 @@ export default function Profile() {
                   <Button
                     key={tag}
                     type="button"
-                    variant={formData.selectedTags.includes(tag) ? "default" : "secondary"}
+                    variant={formData.tags.includes(tag) ? "default" : "secondary"}
                     onClick={() => toggleTag(tag)}
                     className="text-sm"
                   >
@@ -173,7 +191,7 @@ export default function Profile() {
                 ))}
               </div>
             </div>
-            <button>Save</button>
+            <button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg">Save</button>
           </form>
         ) : (
         <div className="text-center mb-8">

@@ -97,6 +97,7 @@ def update_user_profile(request):
         user.username = data.get('username', user.username)
         user.bio = data.get('bio', user.bio)
         user.occupation = data.get('occupation', user.occupation)
+        user.email = data.get('email', user.email)
         # Save the updated user instance
         user.save()
 
