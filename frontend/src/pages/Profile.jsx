@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import { Github, Twitter, Linkedin } from "lucide-react";
+import { Github } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import axiosInstance from "../AxiosConfig.js";
 
@@ -27,7 +27,7 @@ export default function Profile() {
         .then(res => {
           console.log("Profile data:", res.data);
           setProfile({
-            name: res.data.name,
+            name: res.data.username,
             avatar: res.data.avatar,
             occupation: res.data.occupation,
             bio: res.data.bio,
@@ -73,7 +73,7 @@ export default function Profile() {
             alt={`${name}'s avatar`}
           />
           <h1 className="text-3xl font-bold">{name?.trim() ? name : "Your Name"}</h1>
-          <p className="text-gray-400">{occupation || "Your Occupation"}</p>
+          <p className="text-gray-400">{occupation || "Developer"}</p>
         </div>
 
         <section className="bg-gray-800/50 rounded-lg border border-gray-700 p-6 mb-8">
@@ -82,42 +82,80 @@ export default function Profile() {
         </section>
 
         <section className="bg-gray-800/50 rounded-lg border border-gray-700 p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">My Projects</h2>
-          <ul className="list-disc list-inside text-gray-300">
-            {projects.length > 0
-              ? projects.map(p => <li key={p.id}>{p.title}</li>)
-              : <li>No projects yet.</li>
-            }
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <h2 className="w-5 h-5 text-blue-400"/> My Projects
+        </h2>
+        <div className="h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-700">
+          <ul className="divide-y divide-gray-700">
+            {projects.length > 0 ? (
+              projects.map((p) => (
+                <li key={p.id} className="py-2">
+                  <Link
+                    to={`/post/${p.id}`}
+                    className="flex items-center gap-3 px-3 py-2 hover:bg-gray-700 rounded transition-colors"
+                  >
+                    <img
+                      src={avatar || "/images/default-avatar.png"}
+                      alt={`${name}'s avatar`}
+                      className="h-6 w-6 rounded-full"
+                    />
+                    <div className="flex-1">
+                      <div className="text-white font-medium truncate">
+                        {p.title}
+                      </div>
+                      {p.description && (
+                        <div className="text-gray-400 text-sm truncate">
+                          {p.description.substring(0, 80)}
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                </li>
+              ))
+            ) : (
+              <li className="py-2 text-gray-400">No posted projects yet.</li>
+            )}
           </ul>
-        </section>
-
-        <section className="bg-gray-800/50 rounded-lg border border-gray-700 p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Liked Projects</h2>
-          <ul className="list-disc list-inside text-gray-300">
-            {likedProjects.length > 0
-              ? likedProjects.map(p => <li key={p.id}>{p.title}</li>)
-              : <li>No liked projects yet.</li>
-            }
-          </ul>
-        </section>
-
-        <div className="flex justify-center gap-4">
-          {githubUrl && (
-            <Button as="a" href={githubUrl} variant="ghost" size="icon">
-              <Github className="h-5 w-5" />
-            </Button>
-          )}
-          {twitterUrl && (
-            <Button as="a" href={twitterUrl} variant="ghost" size="icon">
-              <Twitter className="h-5 w-5" />
-            </Button>
-          )}
-          {linkedinUrl && (
-            <Button as="a" href={linkedinUrl} variant="ghost" size="icon">
-              <Linkedin className="h-5 w-5" />
-            </Button>
-          )}
         </div>
+      </section>
+
+      <section className="bg-gray-800/50 rounded-lg border border-gray-700 p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <h2 className="w-5 h-5 text-blue-400"/> Liked Projects
+        </h2>
+        <div className="h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-700">
+          <ul className="divide-y divide-gray-700">
+            {likedProjects.length > 0 ? (
+              likedProjects.map((p) => (
+                <li key={p.id} className="py-2">
+                  <Link
+                    to={`/post/${p.id}`}
+                    className="flex items-center gap-3 px-3 py-2 hover:bg-gray-700 rounded transition-colors"
+                  >
+                    <img
+                      src={p.avatar || avatar || "/images/default-avatar.png"}
+                      alt={`${p.author}'s avatar`}
+                      className="h-6 w-6 rounded-full"
+                    />
+                    <div className="flex-1">
+                      <div className="text-white font-medium truncate">
+                        {p.title}
+                      </div>
+                      {p.description && (
+                        <div className="text-gray-400 text-sm truncate">
+                          {p.description.substring(0, 80)}
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                </li>
+              ))
+            ) : (
+              <li className="py-2 text-gray-400">No liked projects yet.</li>
+            )}
+          </ul>
+        </div>
+      </section>
         <div className="flex justify-end mb-6">
         <Button variant="destructive" onClick={handleSignOut}>
           Log Out

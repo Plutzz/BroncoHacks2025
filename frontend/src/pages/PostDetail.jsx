@@ -92,7 +92,7 @@ export default function PostDetail() {
         <h2 className="text-2xl font-bold">Post not found</h2>
         <Button
           variant="ghost"
-          onClick={() => navigate("/home")}
+          onClick={() => navigate(-1)}
           className="mt-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -110,11 +110,11 @@ export default function PostDetail() {
     >
       <Button
         variant="ghost"
-        onClick={() => navigate("/home")}
+        onClick={() => navigate(-1)}
         className="mb-6"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Feed
+        Back
       </Button>
 
       <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-8">
