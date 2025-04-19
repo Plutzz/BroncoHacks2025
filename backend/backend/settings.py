@@ -18,6 +18,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_DIR = BASE_DIR.parent
 FRONTEND_DIST = PROJECT_DIR / 'frontend' / 'dist'
 
+# where uploaded files live on disk:
+MEDIA_ROOT = BASE_DIR / "media"
+# the URL that serves them:
+MEDIA_URL = "/media/"
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
