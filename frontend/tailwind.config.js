@@ -65,11 +65,29 @@ module.exports = {
 					from: { height: 'var(--radix-accordion-content-height)' },
 					to: { height: 0 },
 				},
+				'stripe-move': {
+				'0%': {
+					backgroundPosition: '0 0',
+				},
+				'100%': {
+					backgroundPosition: '100% 100%',
+				},
+        },
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
+				'stripe-move': 'stripe-move 5s linear infinite',
 			},
+			backgroundImage: theme => ({
+				'diagonal-stripes': `repeating-linear-gradient(
+				  45deg,
+				  #1f2937,
+				  #1f2937 10px,
+				  #111827 10px,
+				  #111827 20px
+				)`
+			  })
 		},
 	},
 	plugins: [require('tailwindcss-animate')],

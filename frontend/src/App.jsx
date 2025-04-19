@@ -14,7 +14,20 @@ import Landing from "./pages/Landing";
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+      <div className="min-h-screen text-white"
+      style={{
+    backgroundImage: `
+      repeating-linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.03) 0px,
+        rgba(255, 255, 255, 0.03) 5px,
+        rgba(0, 0, 0, 0.03) 5px,
+        rgba(0, 0, 0, 0.03) 10px
+      ),
+      linear-gradient(to bottom,rgb(34, 43, 66),rgb(48, 28, 58))
+    `,
+    backgroundBlendMode: "overlay",
+  }}> {/* //#1f2937 */}
         <Navbar />
         <main className="px-2 py-8">
           <Routes>
