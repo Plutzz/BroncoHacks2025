@@ -28,6 +28,7 @@ urlpatterns = [
     path('TestApp/', include('TestApp.urls')),
     path('api/accounts/', include('accounts.urls')),
     path('api/posts/', include('posts.urls')),
+    path('api/userprofile/', include('userprofile.urls')),
     path('', TemplateView.as_view(template_name='index.html'), name='index'),
 ]
     

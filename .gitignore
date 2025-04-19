@@ -2,3 +2,4 @@
 /backend/bronco
 /bronco
 /backend/accounts/__pycache__
+*.pyc
