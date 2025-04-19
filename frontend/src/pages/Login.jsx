@@ -17,7 +17,6 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-<<<<<<< Updated upstream
     try {
       const res = await axiosInstance.post("/api/accounts/login/", formData);
       if (res.data.success) {
@@ -30,13 +29,6 @@ function Login() {
           description: res.data.error || "Invalid credentials",
           variant: "destructive",
         });
-=======
-    // Implement login logic here
-    response = await axiosInstance.post('api/accounts/login/', 
-      {
-        username : formData.email,
-        password: "testpassword123",
->>>>>>> Stashed changes
       }
     } catch (err) {
       toast({
