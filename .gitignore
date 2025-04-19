@@ -3,3 +3,4 @@
 /bronco
 /backend/accounts/__pycache__
 *.pyc
+/venv
