@@ -47,3 +47,5 @@ def register_view(request):
             return Response({'success': False, 'error': str(e)}, status=400)
     
     return render(request, 'accounts/register.html')
+
+# Create your views here.

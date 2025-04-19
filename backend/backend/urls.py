@@ -27,9 +27,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('TestApp/', include('TestApp.urls')),
     path('accounts/', include('accounts.urls')),
+    path('api/posts/', include('posts.urls')),
     path('', TemplateView.as_view(template_name='index.html'), name='index'),
 ]
-
+    
 if settings.DEBUG:
     if settings.STATICFILES_DIRS:
         urlpatterns += static(settings.STATIC_URL,

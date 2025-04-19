@@ -23,6 +23,7 @@ FRONTEND_DIST = PROJECT_DIR / 'frontend' / 'dist'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-j=7(fe!%@48l*8jptk)_@=0ndhz7^0(d5)$hd7fu^i+xle-2vf'
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -45,7 +46,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'TestApp.apps.TestappConfig',
-    'accounts'
+	'accounts',
+	'posts',
 ]
 
 MIDDLEWARE = [
@@ -89,8 +91,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'devdrop',
+        'USER': 'root',
+        'PASSWORD': '12bucklemyshoe',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
