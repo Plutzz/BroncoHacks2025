@@ -45,7 +45,7 @@ function Home() {
   // fetch users posts
   const loadUserProjects = async () => {
     try {
-      const res = await axiosInstance.get("api/userprofile/fetch_user_posts/");
+      const res = await axiosInstance.get("api/userprofile/fetch-user-posts/");
       const list = Array.isArray(res.data.data)
         ? res.data.data
         : [];
@@ -127,11 +127,6 @@ function Home() {
             <ul className="space-y-3">
               {userProjects.map((proj) => (
                 <li key={proj.id}>
-                  <img
-                    src={avatar || "/images/default-avatar.png"}
-                    alt={`User's avatar`}
-                    className="h-6 w-6 rounded-full"
-                  />
                   <Link
                     to={`/post/${proj.id}`}
                     className="block p-3 rounded-md hover:bg-gray-700 transition-colors"
@@ -170,46 +165,54 @@ function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 className="bg-gray-800 rounded-lg p-6 hover:shadow-xl transition-all hover:scale-[1.02]">
-                <Link to={`/post/${post.id}`}>
-                  <h2 className="text-xl font-semibold mb-2 hover:text-blue-400 transition-colors">
-                    {post.title}
-                  </h2>
-                  <p className="text-gray-300 mb-4">
-                    {post.description?.substring(0, 150) || ""}
-                  </p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {post.tags?.map((t) => (
-                      <span
-                        key={t}
-                        className="bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm"
+                <Link to={`/post/${post.id}`} className="block">
+
+                  <div className="flex items-center gap-3 mb-4">
+                    <img
+                      src={post.authorAvatar || "/images/default-avatar.png"}
+                      alt={`${post.author}'s avatar`}
+                      className="h-8 w-8 rounded-full"
+                    />
+                    <h2 className="text-xl font-semibold hover:text-blue-400 transition-colors">
+                      {post.title}
+                    </h2>
+                  </div>
+                    <p className="text-gray-300 mb-4">
+                      {post.content?.substring(0, 150) || ""}
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {post.tags?.map((t) => (
+                        <span
+                          key={t}
+                          className="bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleLike(post.id);
+                        }}
+                        className="flex items-center gap-2"
                       >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleLike(post.id);
-                      }}
-                      className="flex items-center gap-2"
-                    >
-                      <Heart className="h-4 w-4" />
-                      <span>{post.likes}</span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => handleComments(e, post.id)}
-                      className="flex items-center gap-2"
-                    >
-                      <MessageCircle className="h-4 w-4" />
-                      <span>{post.comments?.length || 0}</span>
-                    </Button>
-                  </div>
+                        <Heart className="h-4 w-4" />
+                        <span>{post.likes}</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => handleComments(e, post.id)}
+                        className="flex items-center gap-2"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        <span>{post.comments?.length || 0}</span>
+                      </Button>
+                    </div>
                 </Link>
               </motion.div>
             ))

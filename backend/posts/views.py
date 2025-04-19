@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.db.models import Q
 from rest_framework.decorators import api_view
 import json
-from .models import Post, Comment, PostLike
+from .models import Post, Comment, PostLike, Tag
 from django.shortcuts import get_object_or_404
 
 @api_view(['POST'])
@@ -17,6 +17,8 @@ def create_post(request):
             pitch = data.get('pitch')
             techStack = data.get('techStack')
             description = data.get('description')
+            github_link = data.get('github_link')
+            tag_names = data.get('tags', [])
 
             if not title or not description or not pitch:
                 return JsonResponse({'error': 'Missing title or content.'}, status=400)
@@ -26,8 +28,15 @@ def create_post(request):
                 title=title,
                 pitch=pitch,
                 description=description,
+                github_link=github_link,
                 tech_stack = techStack,
             )
+            
+            tags = []
+            for tag_name in tag_names:
+                    tag, created = Tag.objects.get_or_create(name=tag_name)
+                    tags.append(tag)
+            post.tags.set(tags)
 
             return JsonResponse({
                 'message': 'Post created successfully!',
@@ -35,7 +44,11 @@ def create_post(request):
                     'id': post.id,
                     'title': post.title,
                     'content': post.description,
-                    'created_at': post.created_at.isoformat()
+                    'created_at': post.created_at.isoformat(),
+                    'author': post.user.username,
+                    'github_link': post.github_link,
+                    'tech_stack': post.tech_stack,
+                    'tags': [tag.name for tag in tags],
                 }
             }, status=201)
 
@@ -59,9 +72,27 @@ def fetch_posts(request):
                 'title': post.title,
                 'content': post.description,
                 'author': post.user.username,
+                'authorAvatar': post.user.avatar if post.user.avatar else None,
+                'pitch': post.pitch,
+                'github_link': post.github_link,
+                'tech_stack': post.tech_stack,
+                'view_count': post.view_count,
+                'likes_count': post.likes.count(),
+                'comments_count': post.comments.count(),
+                'likes': list(post.likes.values_list('user_id', flat=True)),
+                'comments': [
+                    {
+                        'id': comment.id,
+                        'content': comment.content,
+                        'author': comment.user.username,
+                        'created_at': comment.created_at.isoformat()
+                    } for comment in post.comments.all()
+                ],
                 'created_at': post.created_at.isoformat(),
                 'tags': tag_names,
             })
+        
+        print("POST DATA", post_data)
 
         return JsonResponse({
             'message': 'Posts fetched successfully',

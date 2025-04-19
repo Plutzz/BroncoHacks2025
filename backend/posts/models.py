@@ -15,6 +15,7 @@ class Post(models.Model):
     tech_stack = models.TextField(default="N/A")
     view_count = models.IntegerField(default=0)  # number of views
     description = models.TextField()
+    github_link = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:

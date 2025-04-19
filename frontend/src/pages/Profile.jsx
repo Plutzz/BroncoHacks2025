@@ -1,14 +1,21 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Github } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import axiosInstance from "../AxiosConfig.js";
+import { useToast } from "../components/ui/use-toast";
 
+const TECH_TAGS = [
+  "JavaScript", "React", "Node.js", "Python", "Java", "DevOps",
+  "Machine Learning", "Cloud Computing", "Cybersecurity", "Mobile Development", "Game Development",
+  "Data Science", "Blockchain", "Web Development", "UI/UX Design",
+];
 
 export default function Profile() {
     const navigate = useNavigate();   
+    const { toast } = useToast();
     const [profile, setProfile] = useState({
       name: "",
       avatar: "",
@@ -20,7 +27,17 @@ export default function Profile() {
       twitterUrl: "",
       linkedinUrl: ""
     });
-  
+
+    const [editing, setEditing] = useState(false);
+    const fileRef = useRef();
+    const [formData, setFormData] = useState({
+      name : "",
+      occupation : "",
+      bio : "",
+      avatar : "",
+      tags : [],
+    })
+    
     useEffect(() => {
       axiosInstance
         .get("api/userprofile/profile-data/")
@@ -31,8 +48,16 @@ export default function Profile() {
             avatar: res.data.avatar,
             occupation: res.data.occupation,
             bio: res.data.bio,
+            tags: res.data.tags,
             projects: res.data.your_posts,
             likedProjects: res.data.liked_posts
+          });
+          setFormData({
+            name: res.data.username,
+            occupation: res.data.occupation,
+            bio: res.data.bio,
+            avatar: res.data.avatar,
+            tags: res.data.tags,
           });
         })
         .catch(err => console.error("Failed to load profile:", err));
@@ -46,12 +71,53 @@ export default function Profile() {
       navigate("/login");
   
     };
+
+    const handleInputChange = (e) => {
+      const { name, value } = e.target;
+      setFormData(prev => ({
+        ...prev,
+        [name]: name === "tags" ? value.split(",").map(tag => tag.trim()) : value
+      }));
+    };
   
+    const toggleTag = (tag) => {
+      setFormData(prev => ({
+        ...prev,
+        tags: prev.tags.includes(tag)
+          ? prev.tags.filter(t => t !== tag)
+          : [...prev.tags, tag]
+      }));
+    };
+
+    const handleProfileUpdate = async (e) => {
+      e.preventDefault();
+      try {
+          const fd = new FormData();
+          fd.append('username', formData.name);
+          fd.append('occupation', formData.occupation);
+          fd.append('bio', formData.bio);
+          formData.tags.forEach(t => fd.append('tags', t));
+          if (fileRef.current.files[0]) {
+            fd.append('avatar', fileRef.current.files[0]);
+          }
+          await axiosInstance.put('api/userprofile/update-profile/', fd, {
+            headers: {'Content-Type': 'multipart/form-data'}
+          });
+          setProfile(prev => ({ ...prev, ...formData }));
+          setEditing(false);
+          toast({ title: "Profile updated successfully" });
+        } catch (err) {
+          console.error("Update failed:", err);
+          toast({ title: "Failed to update profile." });
+        }
+      };
+      
     const {
       name,
       avatar,
       occupation,
       bio,
+      tags = [],
       projects = [],
       likedProjects = [],
       githubUrl,
@@ -65,7 +131,51 @@ export default function Profile() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-2xl mx-auto"
       >
-
+        {editing ? (
+          <form onSubmit={handleProfileUpdate} encType="multipart/form-data" className="bg-gray-800/50 rounded-lg border border-gray-700 p-6 mb-8">
+            <input
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              className="w-full mb-4 rounded-md border border-gray-700 bg-gray-800 px-3 py-2"
+            />
+            <input
+              name="occupation"
+              value={formData.occupation}
+              onChange={handleInputChange}
+              className="w-full mb-4 rounded-md border border-gray-700 bg-gray-800 px-3 py-2"
+            />
+            <textarea
+              name="bio"
+              value={formData.bio}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full mb-4 rounded-md border border-gray-700 bg-gray-800 px-3 py-2"
+            />
+            <input
+              type="file"
+              ref={fileRef}
+              accept="image/*"
+            />
+            <div>
+              <label className="block mb-2 text-center mt-4">Select Your Interests</label>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {TECH_TAGS.map(tag => (
+                  <Button
+                    key={tag}
+                    type="button"
+                    variant={formData.selectedTags.includes(tag) ? "default" : "secondary"}
+                    onClick={() => toggleTag(tag)}
+                    className="text-sm"
+                  >
+                    {tag}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <button>Save</button>
+          </form>
+        ) : (
         <div className="text-center mb-8">
           <img
             className="h-32 w-32 rounded-full mx-auto mb-4"
@@ -73,8 +183,17 @@ export default function Profile() {
             alt={`${name}'s avatar`}
           />
           <h1 className="text-3xl font-bold">{name?.trim() ? name : "Your Name"}</h1>
-          <p className="text-gray-400">{occupation || "Developer"}</p>
+          <p className="text-gray-400 mb-4">{occupation || "Developer"}</p>
+          <p className="text-sm text-gray-500 mb-6">
+          {tags?.map((tag, index) => (
+            <span key={index} className="mr-2 bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm">
+              {tag}
+            </span>
+          ))}
+        </p>
+        <Button onClick={() => setEditing(true)} className="bg-blue-500 hover:bg-blue-600 text-white">Edit Profile</Button>
         </div>
+      )}
 
         <section className="bg-gray-800/50 rounded-lg border border-gray-700 p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">About Me</h2>

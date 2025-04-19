@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view
+from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
-from posts.models import Post, PostLike
+from posts.models import Post, PostLike, Tag
 from posts.serializers import PostSerializer
 from accounts.models import CustomUser
 from django.http import JsonResponse
@@ -24,7 +25,7 @@ def user_profile_data(request):
             'first_name': user.first_name,
             'last_name': user.last_name,
             'bio': user.bio,
-            'profile_picture': user.avatar if user.avatar else None,
+            'profile_picture': user.avatar.url if user.avatar else None,
         }
 
         # Combine all data into a single response
@@ -41,20 +42,64 @@ def user_profile_data(request):
 
     return Response({'error': 'Unauthorized'}, status=401)
 
+@login_required
 @api_view(['GET'])
 def fetch_user_posts(request):
     """
     Return only the posts created by the current authenticated user.
     """
     user_posts = Post.objects.filter(user=request.user).order_by('-created_at')
-    data = []
-    for post in user_posts:
-        data.append({
+    data = [{
             'id': post.id,
             'title': post.title,
             'content': post.description,
+            'tech_stack': post.tech_stack,
+            'pitch': post.pitch,
+            'github_link': post.github_link,
             'author': post.user.username,
+            'avatar': post.user.avatar.url if post.user.avatar else None,
             'created_at': post.created_at.isoformat(),
             'tags': [t.name for t in post.tags.all()],
-        })
+            'likes_count': post.likes.count(),
+            'comments_count': post.comments.count(),
+            'view_count': post.view_count,
+            'likes': list(post.likes.values_list('user_id', flat=True)),
+            'comments': [
+                {
+                    'id': comment.id,
+                    'content': comment.content,
+                    'author': comment.user.username,
+                    'created_at': comment.created_at.isoformat()
+                } for comment in post.comments.all()
+            ],
+        }
+        for post in user_posts
+        ]
     return JsonResponse({'data': data}, status=200)
+
+@login_required
+@api_view(['PUT'])
+def update_user_profile(request):
+    if request.method == 'PUT' and request.user.is_authenticated:
+        user = request.user
+        data = request.data
+
+        tag_names = data.get('tags', [])
+
+        user.tags.set(
+            [Tag.objects.get_or_create(name=n)[0] for n in tag_names]
+        )
+        # Handle profile picture upload
+        if 'avatar' in request.FILES:
+            user.avatar = request.FILES['avatar']
+            
+        # Update user profile fields
+        user.username = data.get('username', user.username)
+        user.bio = data.get('bio', user.bio)
+        user.occupation = data.get('occupation', user.occupation)
+        # Save the updated user instance
+        user.save()
+
+        return JsonResponse({'message': 'Profile updated successfully'}, status=200)
+
+    return JsonResponse({'error': 'Unauthorized'}, status=401)

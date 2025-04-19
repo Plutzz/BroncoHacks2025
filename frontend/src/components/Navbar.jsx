@@ -42,6 +42,7 @@ function Navbar() {
   };
 
   return (
+    <>
     <motion.nav
       className="border-b border-gray-700 bg-gray-900/50 backdrop-blur-sm"
       initial={{ y: -100 }}
@@ -80,11 +81,6 @@ function Navbar() {
                     />
                   </div>
                 </form>
-                <Link to="/create-post">
-                  <Button variant="ghost" size="icon">
-                    <PlusCircle className="h-5 w-5" />
-                  </Button>
-                </Link>
                 <Link to="/profile">
                   <Button variant="ghost" size="icon">
                     <User className="h-5 w-5" />
@@ -109,6 +105,17 @@ function Navbar() {
         </div>
       </div>
     </motion.nav>
+      {isLoggedIn && (
+        <Link
+          to="/create-post"
+          className="fixed bottom-6 right-6 z-50"
+        >
+          <Button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg">
+            <PlusCircle className="h-6 w-6" />
+          </Button>
+        </Link>
+      )}
+    </>
   );
 }
 

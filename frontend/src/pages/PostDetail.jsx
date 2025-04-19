@@ -29,7 +29,7 @@ export default function PostDetail() {
       // try to fetch current user, but don’t redirect on failure
       try {
         const userRes = await axiosInstance.get("api/accounts/get_current_user/");
-        print("Current user:", userRes.data);
+
         if (userRes == null) {
           setCurrentUser(null);
         } else {
@@ -131,12 +131,12 @@ export default function PostDetail() {
         Back
       </Button>
 
-      <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-8">
+      <div className="relative rounded-lg border border-gray-700 bg-gray-800/50 p-8">
         <div className="flex items-center gap-4 mb-6">
           <img
             className="h-12 w-12 rounded-full"
             alt={`${post.author}'s avatar`}
-            src="https://images.unsplash.com/photo-1666892666066-abe5c4865e9c"
+            src={post.authorAvatar || "/images/default-avatar.png"}
           />
           <div>
             <h3 className="font-semibold">{post.author}</h3>
@@ -145,13 +145,43 @@ export default function PostDetail() {
         </div>
 
         <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
-        <p className="text-gray-300 mb-6">{post.description}</p>
+        <p className="text-gray-400 mb-4">{post.pitch}</p>
+        <p className="text-gray-300 mb-6">{post.content}</p>
+        <p className="text-sm text-gray-500 mb-6">
+          {post.tags?.map((tag, index) => (
+            <span key={index} className="mr-2 bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm">
+              {tag}
+            </span>
+          ))}
+        </p>
+        {/* Add images/documents */}
 
-        {post.techStack && (
+        {currentUser?.id === post.authorId && (
+         <Button
+           variant="destructive"
+           onClick={async () => {               
+            console.log("postID", post.id)
+            const response = await axiosInstance.post('api/posts/delete_post/', 
+              {
+                id: post.id,
+              }
+            ).then(toast({
+              title: "Success",
+              description: "Post deleted successfully."
+            }));
+            navigate("/home");
+          }}
+           className="absolute top-4 right-4"
+         >
+           Delete Post
+         </Button>
+       )}
+
+        {post.tech_stack && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2">Tech Stack</h3>
             <div className="flex flex-wrap gap-2">
-              {post.techStack.split(",").map((tech) => (
+              {post.tech_stack.split(",").map((tech) => (
                 <span
                   key={tech}
                   className="px-3 py-1 rounded-full bg-gray-700 text-sm"
@@ -162,30 +192,9 @@ export default function PostDetail() {
             </div>
           </div>
         )}
-        {/* DELETE POST IF IT IS THE SAME AUTHOR */}
-        {currentUser?.id === post.authorId && (
-          <Button
-          
-            variant="destructive"
-            onClick={async () => {
-              console.log("postID", post.id)
-              const response = await axiosInstance.post('api/posts/delete_post/', 
-                {
-                  id: post.id,
-                }
-              ).then(toast({
-                title: "Success",
-                description: "Post deleted successfully."
-              }));
-              navigate("/");
-            }}
-          >
-            Delete Post
-          </Button>
-        )}
-        {post.githubLink && (
+        {post.github_link && (
           <a
-            href={post.githubLink}
+            href={post.github_link}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-6"
@@ -203,7 +212,7 @@ export default function PostDetail() {
             className="flex items-center gap-2"
           >
             <Heart className="h-4 w-4" />
-            <span>{post.likes || 0}</span>
+            <span>{post.likes_count || 0}</span>
           </Button>
           <Button
             variant="ghost"
@@ -211,7 +220,7 @@ export default function PostDetail() {
             className="flex items-center gap-2"
           >
             <MessageCircle className="h-4 w-4" />
-            <span>{post.comments?.length || 0}</span>
+            <span>{post.comments_count}</span>
           </Button>
         </div>
 
