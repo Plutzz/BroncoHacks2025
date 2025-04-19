@@ -22,16 +22,19 @@ export default function Profile() {
     });
   
     useEffect(() => {
-      axiosInstance
-        .get("api/userprofile/profile-data/")
-        .then(res => setProfile(res.data))
-        .catch(err => console.error("Failed to load profile:", err));
-    }, []);
+    //   axiosInstance
+    //     .get("api/userprofile/profile-data/")
+    //     .then(res => setProfile(res.data))
+    //     .catch(err => console.error("Failed to load profile:", err));
+    // }, []);
 
-    const handleSignOut = () => {
-      axiosInstance.post("api/accounts/logout/") 
-        .then(() => navigate("/login"))
+    const handleSignOut = async () => {
+      const response = await axiosInstance.post("api/accounts/logout/") 
         .catch(err => console.error("Logout failed:", err));
+
+      print(response.data);
+      navigate("/login");
+  
     };
   
     const {

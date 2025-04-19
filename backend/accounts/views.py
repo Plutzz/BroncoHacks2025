@@ -27,6 +27,7 @@ def login_view(request):
 
 @api_view(['POST'])
 def logout_view(request):
+    print(request.user)
     logout(request)
     return Response({'success': True})
 
@@ -52,7 +53,7 @@ def register_view(request):
 
 @api_view(['GET'])
 def check_authentication(request):
-    print(request.user, request.user.is_authenticated)
+    print("Check Auth", request.user, request.user.is_authenticated)
     if request.user.is_authenticated:
         return Response({'authenticated': True, 'username': request.user.username})
     else:

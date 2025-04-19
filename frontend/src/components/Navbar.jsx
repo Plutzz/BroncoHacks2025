@@ -12,7 +12,6 @@ function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    setIsLoggedIn(true);
     axiosInstance.get('api/accounts/check_authentication/')
       .then(res => {
         if (res.data.authenticated) {
