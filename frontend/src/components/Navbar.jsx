@@ -7,7 +7,7 @@ import { Icon } from "./ui/icon";
 import { Home, User, PlusCircle, Search } from "lucide-react";
 
 function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // This will be replaced with actual auth state
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = (e) => {
