@@ -9,7 +9,7 @@ import CreatePost from "./pages/CreatePost";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PostDetail from "./pages/PostDetail";
-
+import Landing from "./pages/Landing";
 
 function App() {
   return (
@@ -18,7 +18,8 @@ function App() {
         <Navbar />
         <main className="container mx-auto px-4 py-8">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/create-post" element={<CreatePost />} />
             <Route path="/login" element={<Login />} />

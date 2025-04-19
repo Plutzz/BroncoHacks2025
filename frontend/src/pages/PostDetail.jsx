@@ -86,7 +86,7 @@ export default function PostDetail() {
         <h2 className="text-2xl font-bold">Post not found</h2>
         <Button
           variant="ghost"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/home")}
           className="mt-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
