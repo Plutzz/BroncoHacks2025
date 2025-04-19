@@ -5,6 +5,7 @@ from posts.models import Post, PostLike, Tag
 from posts.serializers import PostSerializer
 from accounts.models import CustomUser
 from django.http import JsonResponse
+from django.db.models import Count
 
 @api_view(['GET'])
 def user_profile_data(request):
@@ -106,3 +107,37 @@ def update_user_profile(request):
         return JsonResponse({'message': 'Profile updated successfully'}, status=200)
 
     return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+@login_required
+@api_view(['GET'])
+def fetch_user_analytics(request):
+    """
+    Fetch the user's most liked and most viewed posts.
+    """
+    user_posts = Post.objects.filter(user=request.user)
+
+    # Get the most liked post
+    most_liked_post = (
+        user_posts.annotate(like_count=Count('likes'))
+        .order_by('-like_count')
+        .first()
+    )
+
+    # Get the most viewed post
+    most_viewed_post = user_posts.order_by('-view_count').first()
+
+    # Prepare the response data
+    data = {
+        'most_liked': {
+            'id': most_liked_post.id,
+            'title': most_liked_post.title,
+            'like_count': getattr(most_liked_post, 'like_count', 0),
+        } if most_liked_post else None,
+        'most_viewed': {
+            'id': most_viewed_post.id,
+            'title': most_viewed_post.title,
+            'view_count': getattr(most_viewed_post, 'view_count', 0),
+        } if most_viewed_post else None,
+    }
+
+    return JsonResponse(data, status=200)

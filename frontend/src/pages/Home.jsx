@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { BookMarked, Tag, Filter, Heart, MessageCircle } from "lucide-react";
+import { BookMarked, Tag, TrendingUp, Heart, Eye, MessageCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import axiosInstance from "../AxiosConfig.js";
@@ -16,6 +15,7 @@ function Home() {
   const tags = POPULAR_TAGS;
   const [posts, setPosts] = useState([]);
   const [userProjects, setUserProjects] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
@@ -79,7 +79,7 @@ function Home() {
           selectedTags.length === 0 ||
           post.tags?.some((t) => selectedTags.includes(t))
         );
-console.log("Filtered posts:", displayPosts);
+  console.log("Filtered posts:", displayPosts);
   const ensureLoggedIn = async () => {
     try {
       const res = await axiosInstance.get("api/accounts/check_authentication/");
@@ -96,7 +96,6 @@ console.log("Filtered posts:", displayPosts);
     }
   };
 
-
   const handleLike = async (postId) => {
     if (!(await ensureLoggedIn())) return;
     const response = await axiosInstance.post("api/posts/like/", {post_id:postId})
@@ -109,9 +108,20 @@ console.log("Filtered posts:", displayPosts);
     navigate(`/post/${postId}`);
   };
 
+  const loadAnalytics = async () => {
+    try {
+      const res = await axiosInstance.get("api/userprofile/fetch-user-analytics/");
+      console.log("Analytics Data:", res.data);
+      setAnalytics(res.data);
+    } catch (err) {
+      console.error("Failed to fetch analytics:", err);
+    }
+  };
+
   useEffect(() => {
     loadUserProjects();
     loadPosts();
+    loadAnalytics();
   }, [searchQuery, location.key]);
 
   return (
@@ -140,6 +150,49 @@ console.log("Filtered posts:", displayPosts);
                   </Link>
                 </li>
               ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-gray-400">No projects yet</p>
+          )}
+        </div>
+        {/* My Analytics Section */}
+        <div className="bg-gray-800 rounded-lg p-4 sticky top-20 mt-8">
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp className="w-5 h-5 text-green-400" />
+            <h2 className="text-lg font-semibold">My Analytics</h2>
+          </div>
+          {analytics && (analytics.most_liked || analytics.most_viewed) ? (
+            <ul className="space-y-3">
+              {analytics.most_liked && (
+                <li>
+                  <div className="flex items-center gap-2">
+                    <Heart className="h-5 w-5 text-red-400" />
+                    <div>
+                      <p className="font-medium text-sm">
+                        Most Liked: {analytics.most_liked.title}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {analytics.most_liked.like_count} likes
+                      </p>
+                    </div>
+                  </div>
+                </li>
+              )}
+              {analytics.most_viewed && (
+                <li>
+                  <div className="flex items-center gap-2">
+                    <Eye className="h-5 w-5 text-green-400" />
+                    <div>
+                      <p className="font-medium text-sm">
+                        Most Viewed: {analytics.most_viewed.title}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {analytics.most_viewed.view_count} views
+                      </p>
+                    </div>
+                  </div>
+                </li>
+              )}
             </ul>
           ) : (
             <p className="text-sm text-gray-400">No projects yet</p>
