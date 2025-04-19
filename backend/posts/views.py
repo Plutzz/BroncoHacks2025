@@ -1,6 +1,7 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.db.models import Q
 from rest_framework.decorators import api_view
 import json
 from .models import Post, Comment, PostLike
@@ -89,6 +90,28 @@ def delete_post(request):
 
     post.delete()
     return JsonResponse({'message': 'Post deleted successfully'})
+
+@api_view(['GET'])
+def search_posts(request):
+    query = request.GET.get('search', '')
+
+    posts = Post.objects.filter(
+        Q(title__icontains=query) |
+        Q(description__icontains=query)
+    ).order_by('-created_at')
+
+    posts_data = [
+        {
+            'id': post.id,
+            'title': post.title,
+            'description': post.description,
+            'author': post.user.username,
+            'created_at': post.created_at.isoformat(),
+        }
+        for post in posts
+    ]
+
+    return JsonResponse({'results': posts_data})
 
 # =======================
 #      Like Post

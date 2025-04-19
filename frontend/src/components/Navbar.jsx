@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Icon } from "./ui/icon";
@@ -11,6 +11,7 @@ function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     axiosInstance.get('api/accounts/check_authentication/')
@@ -29,6 +30,7 @@ function Navbar() {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    navigate(`/?search=${encodeURIComponent(searchQuery)}`);
     // Implement search functionality here
     console.log("Searching for:", searchQuery);
   };
