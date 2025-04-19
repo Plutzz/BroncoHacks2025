@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Github } from "lucide-react";
+import { Github, PencilLineIcon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import axiosInstance from "../AxiosConfig.js";
@@ -101,7 +101,7 @@ export default function Profile() {
           fd.append('occupation', formData.occupation);
           fd.append('bio', formData.bio);
           fd.append('email', formData.email);
-          formData.tags.forEach(t => fd.append('tags', t));
+
           if (fileRef.current.files[0]) {
             fd.append('avatar', fileRef.current.files[0]);
           }
@@ -194,22 +194,24 @@ export default function Profile() {
             <button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg">Save</button>
           </form>
         ) : (
-        <div className="text-center mb-8">
-          <img
-            className="h-32 w-32 rounded-full mx-auto mb-4"
-            src={avatar || "images/default-avatar.png"}
-            alt={`${name}'s avatar`}
-          />
-          <h1 className="text-3xl font-bold">{name?.trim() ? name : "Your Name"}</h1>
-          <p className="text-gray-400 mb-4">{occupation || "Developer"}</p>
-          <p className="text-sm text-gray-500 mb-6">
-          {tags?.map((tag, index) => (
-            <span key={index} className="mr-2 bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm">
-              {tag}
-            </span>
-          ))}
-        </p>
-        <Button onClick={() => setEditing(true)} className="bg-blue-500 hover:bg-blue-600 text-white">Edit Profile</Button>
+        <div className="relative mb-8">
+          <PencilLineIcon onClick={() => setEditing(true)} className="bsolute top-2 right-2 p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full cursor-pointer h-6 w-6"/>
+          <div className="text-center mb-8">
+              <img
+                className="h-32 w-32 rounded-full mx-auto mb-4"
+                src={avatar || "images/default-avatar.png"}
+                alt={`${name}'s avatar`}
+              />
+              <h1 className="text-3xl font-bold">{name?.trim() ? name : "Your Name"}</h1>
+              <p className="text-gray-400 mb-4">{occupation || "Developer"}</p>
+              <p className="text-sm text-gray-500 mb-6">
+              {tags?.map((tag, index) => (
+                <span key={index} className="mr-2 bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm">
+                  {tag}
+                </span>
+              ))}
+            </p>
+          </div>
         </div>
       )}
 
