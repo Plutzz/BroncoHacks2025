@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import axiosInstance from "../AxiosConfig.js";
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -13,10 +14,20 @@ function Signup() {
     confirmPassword: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Implement signup logic here
+
+    const response = await axiosInstance.post('api/accounts/register/', 
+      {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      }
+    );
+
     console.log("Signup attempt:", formData);
+    console.log("Response:", response);
   };
 
   return (

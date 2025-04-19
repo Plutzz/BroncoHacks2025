@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
-from .models import CustomUser
+from accounts.models import CustomUser
 
 
 @ensure_csrf_cookie
@@ -40,10 +40,10 @@ def register_view(request):
     if request.method == 'POST':
         # Handle registration logic
         # This is simplified - you'd validate data and handle errors
-        from django.contrib.auth.models import User
+        print("RECIEVED POST")
         username = request.data.get('username')
         password = request.data.get('password')
-        email = request.data.get('email', '')
+        email = request.data.get('email')
         
         try:
             user = CustomUser.objects.create_user(username, email, password)
