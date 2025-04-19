@@ -14,6 +14,7 @@ export default function PostDetail() {
   const [post, setPost] = useState(null);
   const [comment, setComment] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     async function loadDetail() {
@@ -146,25 +147,49 @@ export default function PostDetail() {
         {/* Add images/documents */}
 
         {currentUser?.id === post.authorId && (
-         <Button
-           variant="destructive"
-           onClick={async () => {               
-            console.log("postID", post.id)
-            const response = await axiosInstance.post('api/posts/delete_post/', 
-              {
-                id: post.id,
-              }
-            ).then(toast({
-              title: "Success",
-              description: "Post deleted successfully."
-            }));
-            navigate("/home");
-          }}
-           className="absolute top-4 right-4"
-         >
-           Delete Post
-         </Button>
-       )}
+          <>
+            <Button
+              variant="destructive"
+              onClick={() => setShowDeleteDialog(true)} // Show the delete dialog
+              className="absolute top-4 right-4"
+            >
+              Delete Post
+            </Button>
+
+            {showDeleteDialog && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Are you sure you want to delete this post?
+                  </h3>
+                  <div className="flex justify-center gap-4">
+                    <Button
+                      variant="destructive"
+                      onClick={async () => {
+                        const response = await axiosInstance.post("api/posts/delete_post/", {
+                          id: post.id,
+                        });
+                        toast({
+                          title: "Success",
+                          description: "Post deleted successfully.",
+                        });
+                        navigate("/home");
+                      }}
+                    >
+                      Yes, Delete
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => setShowDeleteDialog(false)} // Close the dialog
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
 
         {post.tech_stack && (
           <div className="mb-6">
