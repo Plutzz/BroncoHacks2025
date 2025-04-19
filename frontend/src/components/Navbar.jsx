@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Icon } from "./ui/icon";
 import { Home, User, PlusCircle, Search } from "lucide-react";
 
 function Navbar() {
@@ -20,12 +21,8 @@ function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between gap-4">
           <Link to="/" className="flex items-center gap-2 shrink-0">
-            <img 
-              src="https://storage.googleapis.com/hostinger-horizons-assets-prod/8239a535-dabc-4715-863a-7b57a29506b6/0f72d798a0a0bdd24b1c93a379adcb89.png"
-              alt="Dev Drop Logo"
-              className="h-8 w-8"
-            />
-            <span className="text-xl font-bold text-blue-500">Dev Drop</span>
+            <Icon className="h-8 w-8 text-blue-500" icon="logo" />
+            <span className="text-xl font-bold text-blue-500">DevDrop</span>
           </Link>
 
           <form onSubmit={handleSearch} className="flex-1 max-w-md hidden md:block">
