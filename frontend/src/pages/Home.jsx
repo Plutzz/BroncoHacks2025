@@ -89,13 +89,8 @@ function Home() {
 
   const handleLike = async (postId) => {
     if (!(await ensureLoggedIn())) return;
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? { ...post, likes: post.likes + 1 }
-          : post
-      )
-    );
+    const response = await axiosInstance.post("api/posts/like/", {post_id:postId})
+    loadPosts();
   };
 
   const handleComments = async (e, postId) => {

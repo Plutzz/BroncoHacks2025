@@ -1,8 +1,9 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 from django.db.models import Q
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 import json
 from .models import Post, Comment, PostLike, Tag
 from .serializers import CommentSerializer
@@ -85,7 +86,7 @@ def fetch_posts(request):
                 'view_count': post.view_count,
                 'likes_count': post.likes.count(),
                 'comments_count': post.comments.count(),
-                'likes': list(post.likes.values_list('user_id', flat=True)),
+                'likes': post.likes.count(),
                 'comments': [
                     {
                         'id': comment.id,
@@ -141,6 +142,7 @@ def search_posts(request):
             'description': post.description,
             'author': post.user.username,
             'created_at': post.created_at.isoformat(),
+            'likes' : post.likes.count()
         }
         for post in posts
     ]
@@ -152,59 +154,26 @@ def search_posts(request):
 # =======================
 
 @api_view(['POST'])
-def like_post(request, post_id):
+@permission_classes([IsAuthenticated])
+def toggle_like(request):
+    post_id = request.data.get('post_id')
+    user = request.user
+
+    if not post_id:
+        return JsonResponse({'error': 'post_id is required'}, status=400)
+
     try:
-        data = request.data or json.loads(request.body)
-    except ValueError:
-        return JsonResponse({'message': 'Invalid JSON.', 'status': 400}, status=400)
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return JsonResponse({'error': 'Post not found'}, status=404)
 
-    userID = data.get('userID')
+    like, created = PostLike.objects.get_or_create(user=user, post=post)
+    if not created:
+        # Already liked, so unlike
+        like.delete()
+        return JsonResponse({'liked': False, 'message': 'Post unliked'}, status=200)
 
-    # validations
-    if not userID:
-        return JsonResponse({'message': 'userID was not provided', 'status': 400}, status=400)
-    # if len(post_id) != 24 or len(userID) != 24:
-    #     return JsonResponse({'message': 'Post or User ID must be 24 char long', 'status': 400}, status=400)
-
-    # fetch post with related author/comments
-    post = get_object_or_404(
-        PostLike.objects.select_related('post'),
-        user=userID,
-        post=post_id
-    )
-
-    # check if post exists
-    if not post:
-        return JsonResponse({'message': 'Post not found', 'status': 404}, status=404)
-
-    # check if user already liked the post
-    if post.likes.filter(author=request.user).exists():
-        post.likes.remove(request.user)
-    else:
-        post.likes.add(request.user)
-
-    # build response payload
-    new_post = {
-        'id': str(post.id),
-        'title': post.title,
-        'content': post.content,
-        'likes': list(post.likes.values_list('author__id', flat=True)),
-        'author': post.author.username,
-        'comments': [
-            {
-                'id': str(comment.id),
-                'content': comment.content,
-                'author': comment.author.username,
-                'created_at': comment.created_at.isoformat()
-            } for comment in post.comments.all()
-        ],
-    }
-
-    return JsonResponse({
-        'message': 'Post like handled',
-        'status': 200,
-        'newPost': new_post
-    }, status=200)
+    return JsonResponse({'liked': True, 'message': 'Post liked'}, status=200)
 
 # =======================
 #      Comment Post
