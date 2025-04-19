@@ -48,10 +48,26 @@ def fetch_posts(request):
         try:
             
             posts = Post.objects.all()
+            post_data = []
+
+            for post in posts:
+                tags = post.tags.all()
+                tag_names = [tag.name for tag in tags]
+
+                post_data.append({
+                    'id': post.id,
+                    'title': post.title,
+                    'content': post.description,
+                    'author': post.user.username,
+                    'created_at': post.created_at.isoformat(),
+                    'tags': tag_names,
+                })
+            print(post_data)
             return JsonResponse({
                 'message': 'Posts fetched successfully',
-                'data' : posts,
+                'data' : post_data,
             }, status=201)
+        
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON.'}, status=400)
 

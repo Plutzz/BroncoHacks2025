@@ -4,15 +4,23 @@ import { motion } from "framer-motion";
 import { Heart, MessageCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Link } from "react-router-dom";
+import axiosInstance from "../AxiosConfig.js";
 
 function Home() {
   const [posts, setPosts] = useState([]);
 
-  useEffect(() => {
-    const savedPosts = localStorage.getItem("posts");
-    if (savedPosts) {
-      setPosts(JSON.parse(savedPosts));
-    }
+  useEffect( async () => {
+    const response = await axiosInstance.get('api/posts/fetch_posts/')
+      .then(res => {
+        console.log("POST", res.data.data)
+        setPosts(res.data.data)
+        
+      })
+      .catch(err => {
+        console.error('Create post error:', err);
+      });
+
+      console.log(response)
   }, []);
 
   const handleLike = (postId) => {
