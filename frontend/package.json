@@ -25,6 +25,7 @@
     "clsx": "^2.0.0",
     "framer-motion": "^12.7.4",
     "lucide-react": "^0.501.0",
+    "bootstrap": "^5.3.5",
     "normalize.css": "^8.0.1",
     "react": "^19.0.0",
     "react-css-modules": "^4.7.11",
