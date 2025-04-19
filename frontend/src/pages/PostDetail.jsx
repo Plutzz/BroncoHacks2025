@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Heart, MessageCircle, ArrowLeft, Github } from "lucide-react";
+import { Heart, MessageCircle, ArrowLeft, Github, Trash, PencilLine } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useToast } from "../components/ui/use-toast";
 import axiosInstance from "../AxiosConfig.js";
@@ -18,14 +18,13 @@ export default function PostDetail() {
 
   useEffect(() => {
     async function loadDetail() {
-      // fetch all posts, then find this one
-      const resp = await axiosInstance.get("api/posts/fetch_posts/");
-      const found = resp.data.data.find((p) => p.id === Number(id));
-      if (found) {
-        setPost(found);
-      } else {
-        setPost(null);
-      }
+        // fetch single post (includes author_id)
+        try {
+          const resp = await axiosInstance.get(`/api/posts/${id}/`);
+          setPost(resp.data.data);
+        } catch {
+          setPost(null);
+        }
 
       // try to fetch current user, but don’t redirect on failure
       try {
@@ -36,6 +35,7 @@ export default function PostDetail() {
         } else {
           setCurrentUser(userRes.data);
         }
+
       } catch {
         setCurrentUser(null);
       }
@@ -82,12 +82,16 @@ export default function PostDetail() {
     };
 
     const response = await axiosInstance.post("/api/posts/comment/", newComment);
-    console.log(response);
-    toast({
-      title: "Comment added",
-      description: "Your comment has been posted successfully.",
-    });
-    window.location.reload();
+      console.log(response);
+      toast({
+        title: "Comment added",
+        description: "Your comment has been posted successfully.",
+      });
+      window.location.reload();
+  };
+
+  const handleEdit = () => {
+    navigate(`/post/${id}/edit`);
   };
 
   if (!post) {
@@ -96,7 +100,7 @@ export default function PostDetail() {
         <h2 className="text-2xl font-bold">Post not found</h2>
         <Button
           variant="ghost"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/home")}
           className="mt-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -114,7 +118,7 @@ export default function PostDetail() {
     >
       <Button
         variant="ghost"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/home")}
         className="mb-6"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
@@ -145,19 +149,60 @@ export default function PostDetail() {
           ))}
         </p>
         {/* Add images/documents */}
-        {currentUser?.user.id === post.author_id && (
+        {post.files && (
+          (() => {
+            const files = Array.isArray(post.files)
+              ? post.files
+              : [post.files];
+            if (!files.length) return null;
+            return (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-2">Attachments</h3>
+                    <div className="flex flex-wrap gap-4">
+                      {post.files.map((fileUrl, idx) =>
+                        /\.(jpe?g|png|gif)$/i.test(fileUrl) ? (
+                          <img
+                            key={idx}
+                            src={fileUrl}
+                            alt={`attachment-${idx}`}
+                            className="max-h-48 rounded border border-gray-600"
+                          />
+                        ) : /\.(mp4|webm|ogg)$/i.test(fileUrl) ? (
+                          <video
+                            key={idx}
+                            src={fileUrl}
+                            controls
+                            className="max-h-60 rounded border border-gray-600"
+                          />
+                        ) : (
+                          <a
+                            key={idx}
+                            href={fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:underline"
+                          >
+                            {fileUrl.split("/").pop()}
+                          </a>
+                        )
+                      )}
+                    </div>
+                  </div>
+            );
+          }
+        ))}
+        {currentUser?.id === post.author_id && (
           <>
-            <Button
+
+            <Trash
               variant="destructive"
-              onClick={() => 
-                {
-                  
-                  setShowDeleteDialog(true)
-                }} // Show the delete dialog
-              className="absolute top-4 right-4"
-            >
-              Delete Post
-            </Button>
+              onClick={() => setShowDeleteDialog(true)}
+              className="absolute top-4 right-4 cursor-pointer"
+            />
+            <PencilLine
+              onClick={handleEdit}
+              className="absolute top-4 right-12 cursor-pointer text-blue-400 hover:text-blue-300"
+            />
 
             {showDeleteDialog && (
               <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">

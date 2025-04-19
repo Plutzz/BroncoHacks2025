@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
 import json
-from .models import Post, Comment, PostLike, Tag
+from .models import Post, Comment, PostLike, Tag, PostAttachment
 from .serializers import CommentSerializer
 from django.shortcuts import get_object_or_404
 
@@ -19,7 +19,6 @@ def create_post(request):
             pitch = data.get('pitch')
             techStack = data.get('techStack')
             description = data.get('description')
-            files = data.get('files')
             github_link = data.get('github_link')
             tag_names = data.get('tags').split(",")
             print("TAGS", tag_names)
@@ -30,11 +29,13 @@ def create_post(request):
                 user=request.user,
                 title=title,
                 pitch=pitch,
-                files=files,
                 description=description,
                 github_link=github_link,
                 tech_stack = techStack,
             )
+            
+            for f in request.FILES.getlist('files'):
+                PostAttachment.objects.create(post=post, file=f)
             
             tags = []
             for tag_name in tag_names:
@@ -50,7 +51,7 @@ def create_post(request):
                     'content': post.description,
                     'created_at': post.created_at.isoformat(),
                     'author': post.user.username,
-                    'files': post.files.url if post.files else None,
+                    'files': [att.file.url for att in post.attachments.all()],
                     'pitch': post.pitch,
                     'github_link': post.github_link,
                     'tech_stack': post.tech_stack,
@@ -81,7 +82,7 @@ def fetch_posts(request):
                 'author_id': post.user.id,
                 'authorAvatar': post.user.avatar.url if post.user.avatar else None,
                 'pitch': post.pitch,
-                'files': post.files.url if post.files else None,
+                'files': [att.file.url for att in post.attachments.all()],
                 'github_link': post.github_link,
                 'tech_stack': post.tech_stack,
                 'view_count': post.view_count,
@@ -110,6 +111,89 @@ def fetch_posts(request):
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON.'}, status=400)
 
+@api_view(['PUT','PATCH', 'POST'])
+def update_post(request, id):
+    """
+    Update a post. Only the owner may edit.
+    Accepts multipart/form-data with same fields as create.
+    """
+    post = get_object_or_404(Post, pk=id)
+    if post.user != request.user:
+        return JsonResponse({'detail': 'Forbidden'}, status=403)
+
+    data = request.data
+    post.title = data.get('title', post.title)
+    post.pitch = data.get('pitch', post.pitch)
+    post.description = data.get('description', post.description)
+    post.tech_stack = data.get('tech_stack', post.tech_stack)
+    post.github_link = data.get('github_link', post.github_link)
+    # update tags (clear + add)
+    if 'tags' in data:
+        post.tags.clear()
+        for tag_name in request.data.getlist('tags'):
+            tag_obj, _ = Tag.objects.get_or_create(name=tag_name)
+            post.tags.add(tag_obj)
+    # handle new files
+    if request.FILES:
+        post.attachments.all().delete()
+        
+        for f in request.FILES.getlist('files'):
+            PostAttachment.objects.create(post=post, file=f)
+
+    post.save()
+    # return updated post summary
+    return JsonResponse({
+        'id': post.id,
+        'title': post.title,
+        'pitch': post.pitch,
+        'description': post.description,
+        'created_at': post.created_at.isoformat(),
+        'tech_stack': post.tech_stack,
+        'github_link': post.github_link,
+        'tags': [t.name for t in post.tags.all()],
+        'files': [att.file.url for att in post.attachments.all()],
+    }, status=200)
+    
+@api_view(['GET'])
+def get_post(request, id):
+    """
+    Get a post by ID. Returns the post and its comments.
+    """
+    post = get_object_or_404(Post, pk=id)
+    tags = post.tags.all()
+    tag_names = [tag.name for tag in tags]
+
+    post_data = {
+        'id': post.id,
+        'title': post.title,
+        'content': post.description,
+        'author': post.user.username,
+        'author_id': post.user.id,
+        'authorAvatar': post.user.avatar.url if post.user.avatar else None,
+        'pitch': post.pitch,
+        'files': [att.file.url for att in post.attachments.all()],
+        'github_link': post.github_link,
+        'tech_stack': post.tech_stack,
+        'view_count': post.view_count,
+        'likes_count': post.likes.count(),
+        'comments_count': post.comments.count(),
+        'likes': post.likes.count(),
+        'comments': [
+            {
+                'id': comment.id,
+                'content': comment.content,
+                'author': comment.user.username,
+                'created_at': comment.created_at.isoformat()
+            } for comment in post.comments.all()
+        ],
+        'created_at': post.created_at.isoformat(),
+        'tags': tag_names,
+    }
+
+    return JsonResponse({
+        'message': 'Post fetched successfully',
+        'data' : post_data
+    }, status=200)
 
 @api_view(['POST'])
 @login_required

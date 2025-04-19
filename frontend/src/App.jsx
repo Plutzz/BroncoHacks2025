@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PostDetail from "./pages/PostDetail";
 import Landing from "./pages/Landing";
+import EditPost from "./pages/EditPost";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/post/:id" element={<PostDetail />} />
+            <Route path="/post/:id/edit" element={<EditPost />} />
             <Route path="*" element={<div>404 Not Found</div>} />
           </Routes>
         </main>

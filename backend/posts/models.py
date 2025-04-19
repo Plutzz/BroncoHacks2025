@@ -15,7 +15,6 @@ class Post(models.Model):
     tech_stack = models.TextField(default="N/A", null=True)
     view_count = models.IntegerField(default=0)  # number of views
     description = models.TextField()
-    files = models.FileField(upload_to='files/', blank=True, null=True)
     github_link = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -24,7 +23,11 @@ class Post(models.Model):
         
     def __str__(self):
         return self.title
-    
+
+class PostAttachment(models.Model):
+    post = models.ForeignKey(Post, related_name="attachments", on_delete=models.CASCADE)
+    file = models.FileField(upload_to="files/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 
 # How to create tags
 # =======================================================

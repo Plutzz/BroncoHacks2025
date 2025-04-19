@@ -11,4 +11,6 @@ urlpatterns = [
     path('search/', views.search_posts, name='search_posts'),
     path('comment/', views.create_comment, name='comment'),
     path('fetch_comments/', views.fetch_comments, name='fetch_comment'),
+    path('<int:id>/update/', views.update_post, name='update_post'),
+    path('<int:id>/', views.get_post, name='get_post'),
 ]
