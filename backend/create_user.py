@@ -9,8 +9,9 @@ from accounts.models import CustomUser
 
 # Create a new user
 user = CustomUser.objects.create_user(
-    username="testusername",  # Username for the new user
-    password="testpassword123",  # User's password (it will be hashed)
+    username="Ben",  # Username for the new user
+    password="Ben123",  # User's password (it will be hashed)
+	email="Ben@Ben.com"
 )
 
 

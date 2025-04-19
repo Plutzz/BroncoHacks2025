@@ -15,10 +15,11 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Implement login logic here
-    response = await axiosInstance.post('api/accounts/login/', 
+    const response = await axiosInstance.post('api/accounts/login/', 
       {
-        username: "testusername",
-        password: "testpassword123",
+        username: "Ben",
+        email: formData.email,
+        password: formData.password,
       }
     );
 
