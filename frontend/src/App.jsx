@@ -24,7 +24,7 @@ function App() {
         rgba(0, 0, 0, 0.03) 5px,
         rgba(0, 0, 0, 0.03) 10px
       ),
-      linear-gradient(to bottom,rgb(41, 58, 105), rgb(108, 83, 155)
+      linear-gradient(to bottom,rgb(8, 11, 17), rgb(50, 67, 100)
     `,
     backgroundBlendMode: "overlay",
   }}> {/* //#1f2937 */}

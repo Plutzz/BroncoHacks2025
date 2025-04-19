@@ -112,6 +112,7 @@ export default function Profile() {
           setProfile(prev => ({ ...prev, ...formData }));
           setEditing(false);
           toast({ title: "Profile updated successfully" });
+          window.location.reload();
         } catch (err) {
           console.error("Update failed:", err);
           toast({ title: "Failed to update profile." });

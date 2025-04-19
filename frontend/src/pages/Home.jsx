@@ -148,7 +148,7 @@ function Home() {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">Developer Feed</h1>
             <Link to="/create-post">
-              <Button className="bg-green-500 hover:bg-green-600 text-white">Share Project</Button>
+              <Button className="bg-green-700 hover:bg-green-800 text-white">Share Project</Button>
             </Link>
           </div>
 
