@@ -18,8 +18,6 @@ def create_post(request):
             techStack = data.get('techStack')
             description = data.get('description')
             files = data.get('files')
-            image = data.get('image')
-            video = data.get('video')
             github_link = data.get('github_link')
             tag_names = data.get('tags', [])
 
@@ -31,8 +29,6 @@ def create_post(request):
                 title=title,
                 pitch=pitch,
                 files=files,
-                image=image,
-                video=video,
                 description=description,
                 github_link=github_link,
                 tech_stack = techStack,
@@ -52,8 +48,6 @@ def create_post(request):
                     'content': post.description,
                     'created_at': post.created_at.isoformat(),
                     'author': post.user.username,
-                    'image': post.image.url if post.image else None,
-                    'video': post.video.url if post.video else None,
                     'files': post.files.url if post.files else None,
                     'pitch': post.pitch,
                     'github_link': post.github_link,
@@ -84,8 +78,6 @@ def fetch_posts(request):
                 'author': post.user.username,
                 'authorAvatar': post.user.avatar.url if post.user.avatar else None,
                 'pitch': post.pitch,
-                'image': post.image.url if post.image else None,
-                'video': post.video.url if post.video else None,
                 'files': post.files.url if post.files else None,
                 'github_link': post.github_link,
                 'tech_stack': post.tech_stack,

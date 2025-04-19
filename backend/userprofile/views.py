@@ -58,6 +58,7 @@ def fetch_user_posts(request):
             'github_link': post.github_link,
             'author': post.user.username,
             'avatar': post.user.avatar.url if post.user.avatar else None,
+            'files': post.files.url if post.files else None,
             'created_at': post.created_at.isoformat(),
             'tags': [t.name for t in post.tags.all()],
             'likes_count': post.likes.count(),

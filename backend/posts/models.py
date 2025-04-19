@@ -12,12 +12,10 @@ class Post(models.Model):
 
     title = models.CharField(max_length=255)
     pitch = models.TextField()
-    tech_stack = models.TextField(default="N/A")
+    tech_stack = models.TextField(default="N/A", null=True)
     view_count = models.IntegerField(default=0)  # number of views
     description = models.TextField()
-    files = models.FileField(upload_to='files/', blank=True, null=True)  # for file uploads
-    image = models.ImageField(upload_to='images/', blank=True, null=True)  # for image uploads
-    video = models.FileField(upload_to='videos/', blank=True, null=True)  # for video uploads
+    files = models.FileField(upload_to='files/', blank=True, null=True)
     github_link = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     

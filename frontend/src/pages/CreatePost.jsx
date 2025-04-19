@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
@@ -16,6 +16,7 @@ const POPULAR_TAGS = [
 function CreatePost() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const fileRef = useRef();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -28,8 +29,20 @@ function CreatePost() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await axiosInstance.post("/api/posts/create/", formData);
-
+    const fd = new FormData();
+    fd.append("title", formData.title);
+    fd.append("pitch", formData.pitch);
+    fd.append("description", formData.description);
+    fd.append("tech_stack", formData.techStack);
+    fd.append("github_link", formData.githubLink);
+    formData.tags.forEach(tag => fd.append("tags", tag));
+    if (fileRef.current?.files.length) {
+        Array.from(fileRef.current.files)
+          .forEach(file => fd.append("files", file));
+    }
+    await axiosInstance.post("/api/posts/create/", fd, {
+      headers: { "Content-Type": "multipart/form-data" }
+    });
     const newPost = {
       id: Date.now(),
       ...formData,
@@ -159,8 +172,16 @@ function CreatePost() {
             ))}
           </div>
         </div>
-
-        
+        <div className="block mb-2 text-center mt-4">
+          <label className="block mb-2">Upload Your Files</label>
+          <input
+            type="file"
+            ref={fileRef}
+            multiple
+            accept="*/*"
+            className="w-full"
+          />
+        </div>
         
         <Button type="submit" className="w-full">
           Share Project
