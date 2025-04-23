@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,12 +32,9 @@ SECRET_KEY = 'django-insecure-j=7(fe!%@48l*8jptk)_@=0ndhz7^0(d5)$hd7fu^i+xle-2vf
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1"
-]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -73,8 +71,7 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',  # or 5173 if using Vite
-    'http://localhost:8000',  # or 5173 if using Vite
+    "https://bronco-hacks2025.vercel.app"
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -102,10 +99,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        engine='django.db.backends.mysql',
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
 
 

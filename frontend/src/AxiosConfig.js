@@ -1,11 +1,12 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 // FOR BASE URL: USE 'http://localhost:8000'
+const API = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 const axiosInstance = axios.create({
-  baseURL: 'http://127.0.0.1:8000/',
-  withCredentials: true,  // Important to include cookies (sessionid & csrftoken)
+  baseURL: API + '/',
+  withCredentials: true,
   xsrfCookieName: 'csrftoken',
-  xsrfHeaderName: 'X-CSRFToken'
+  xsrfHeaderName: 'X-CSRFToken',
 });
 
 axiosInstance.interceptors.request.use(
