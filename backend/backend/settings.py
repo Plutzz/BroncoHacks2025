@@ -74,6 +74,10 @@ CORS_ALLOWED_ORIGINS = [
     "https://bronco-hacks2025.vercel.app"
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://bronco-hacks2025.vercel.app",
+]
+
 CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'backend.urls'
