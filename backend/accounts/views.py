@@ -106,3 +106,8 @@ def update_profile(request):
 
         return Response({'message': 'Profile updated successfully', 'user': serializer.data}, status=200)
     return Response(serializer.errors, status=400)
+
+@api_view(['GET'])
+@ensure_csrf_cookie
+def get_csrf_cookie(request):
+    return Response({'detail': 'CSRF cookie set'})

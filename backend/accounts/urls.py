@@ -9,4 +9,5 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('get_current_user/', views.get_current_user, name='get_current_user'),
     path('update/', views.update_profile, name='update_profile'),
+    path('get_csrf_cookie/', views.get_csrf_cookie, name='get_csrf_cookie'),
 ]
