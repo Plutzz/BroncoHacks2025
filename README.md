@@ -3,6 +3,7 @@
 A full‑stack hackathon project for sharing and discovering developer projects.  
 Built with React, Vite & Tailwind on the frontend, and Django REST Framework on the backend.
 
+![Static Badge](https://img.shields.io/badge/react-m?style=for-the-badge&logo=react&labelColor=black&color=%2361DAFB) ![Static Badge](https://img.shields.io/badge/python-m?style=for-the-badge&logo=python&labelColor=yellow&color=blue) ![Static Badge](https://img.shields.io/badge/django-m?style=for-the-badge&logo=django&labelColor=black&color=black) ![Static Badge](https://img.shields.io/badge/vite-m?style=for-the-badge&logo=vite&labelColor=black&color=%23646CFF) ![Static Badge](https://img.shields.io/badge/vercel-m?style=for-the-badge&logo=vercel&labelColor=black&color=%23000000) ![Static Badge](https://img.shields.io/badge/railway-r?style=for-the-badge&logo=railway&labelColor=black&color=%230B0D0E)
 ---
 
 ## 🚀 Features
