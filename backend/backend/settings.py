@@ -16,8 +16,8 @@ import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-PROJECT_DIR = BASE_DIR.parent
-FRONTEND_DIST = PROJECT_DIR / 'frontend' / 'dist'
+# PROJECT_DIR = BASE_DIR.parent
+# FRONTEND_DIST = BASE_DIR / 'frontend' / 'dist'
 
 # where uploaded files live on disk:
 MEDIA_ROOT = BASE_DIR / "media"
@@ -137,26 +137,6 @@ USE_I18N = True
 USE_TZ = True
 
 
- # Serve React build only in DEBUG or if you intend to serve via Django
- # If you’re using Vercel for frontend, you can remove the DIRS/static settings below.
-
-# SINGLE TEMPLATES CONFIGURATION:
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],           # remove FRONTEND_DIST if using Vercel
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -164,8 +144,6 @@ TEMPLATES = [
 STATIC_URL = '/static/'
 # Where collectstatic will gather all your app/static/ files:
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-# STATICFILES_DIRS is only needed if you serve frontend build from Django:
-# STATICFILES_DIRS = [FRONTEND_DIST]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
