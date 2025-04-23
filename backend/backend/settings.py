@@ -72,11 +72,13 @@ REST_FRAMEWORK = {
 
 CORS_ALLOWED_ORIGINS = [
     "https://bronco-hacks2025.vercel.app",
-    "https://bronco-hacks2025-2vxqfoy4u-p-vinhs-projects.vercel.app"
+    "https://bronco-hacks2025-2vxqfoy4u-p-vinhs-projects.vercel.app",
+    "https://bronco-hacks2025-7hntdsxng-p-vinhs-projects.vercel.app"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://bronco-hacks2025.vercel.app",
+    "https://bronco-hacks2025-7hntdsxng-p-vinhs-projects.vercel.app"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
