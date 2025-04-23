@@ -8,6 +8,11 @@ const axiosInstance = axios.create({
   xsrfHeaderName: 'X-CSRFToken'
 });
 
+axiosInstance.get('api/accounts/get_csrf_cookie/')
+  .then(() => console.log('CSRF cookie set'))
+  .catch(err => console.error('Could not get CSRF cookie', err));
+
+
 axiosInstance.interceptors.request.use(
 config => {
 	const csrfToken = Cookies.get('csrftoken');

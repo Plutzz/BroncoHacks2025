@@ -69,19 +69,13 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 }
-
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "https://bronco-hacks2025.vercel.app",
-    "https://bronco-hacks2025-2vxqfoy4u-p-vinhs-projects.vercel.app",
-    "https://bronco-hacks2025-7hntdsxng-p-vinhs-projects.vercel.app"
+    "https://broncohacks2025-production.up.railway.app",
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://bronco-hacks2025.vercel.app",
-    "https://bronco-hacks2025-7hntdsxng-p-vinhs-projects.vercel.app"
-]
-
-CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 
 ROOT_URLCONF = 'backend.urls'
 
