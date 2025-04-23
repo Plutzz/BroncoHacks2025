@@ -96,27 +96,52 @@ export default function Profile() {
     const handleProfileUpdate = async (e) => {
       e.preventDefault();
       try {
-          const fd = new FormData();
-          fd.append('username', formData.name);
-          fd.append('occupation', formData.occupation);
-          fd.append('bio', formData.bio);
-          fd.append('email', formData.email);
-          fd.append('tags', formData.tags);
-          if (fileRef.current.files[0]) {
-            fd.append('avatar', fileRef.current.files[0]);
-          }
-          await axiosInstance.patch('api/accounts/update/', fd, {
-            headers: {'Content-Type': 'multipart/form-data'}
-          });
-          setProfile(prev => ({ ...prev, ...formData }));
-          setEditing(false);
-          toast({ title: "Profile updated successfully" });
-          // window.location.reload();
-        } catch (err) {
-          console.error("Update failed:", err);
-          toast({ title: "Failed to update profile." });
+        const fd = new FormData();
+        fd.append('username', formData.name);
+        fd.append('occupation', formData.occupation);
+        fd.append('bio', formData.bio);
+        fd.append('email', formData.email);
+        fd.append('tags', formData.tags);
+        if (fileRef.current.files[0]) {
+          fd.append('avatar', fileRef.current.files[0]);
         }
-      };
+    
+        // send update and get back the updated profile
+        const res = await axiosInstance.patch(
+          'api/accounts/update/',
+          fd,
+          { headers: { 'Content-Type': 'multipart/form-data' } }
+        );
+        const updated = res.data;
+        const updatedTags = Array.isArray(updated.tags) ? updated.tags : formData.tags;
+        // update local state with server response
+        setProfile(prev => ({
+          ...prev,
+          name:       updated.username,
+          avatar:     updated.avatar,
+          occupation: updated.occupation,
+          bio:        updated.bio,
+          email:      updated.email,
+          tags:       updatedTags,
+        }));
+    
+        // sync formData as well
+        setFormData({
+          name:       updated.username,
+          occupation: updated.occupation,
+          bio:        updated.bio,
+          email:      updated.email,
+          avatar:     updated.avatar,
+          tags:       updatedTags,
+        });
+    
+        setEditing(false);
+        toast({ title: "Profile updated successfully" });
+      } catch (err) {
+        console.error("Update failed:", err);
+        toast({ title: "Failed to update profile." });
+      }
+    };
       
     const {
       name,

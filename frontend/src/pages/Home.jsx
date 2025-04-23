@@ -95,7 +95,8 @@ function Home() {
       if (!(await ensureLoggedIn())) return;
       // toggle on the server
       await axiosInstance.post("api/posts/like/", { post_id: postId });
-      loadPosts();
+      await loadPosts();
+      await loadAnalytics();
       // update UI: flip isLiked and adjust count
       // setPosts(prev =>
       //   prev.map(post => {
@@ -132,6 +133,13 @@ function Home() {
     loadUserProjects();
     loadPosts();
     loadAnalytics();
+
+    const analyticsTimer = setInterval(loadAnalytics, 30_000);
+    const postsTimer = setInterval(loadPosts, 30_000);
+    return () => {
+      clearInterval(analyticsTimer);
+      clearInterval(postsTimer);
+    };
   }, [searchQuery, location.key]);
 
   return (
@@ -140,73 +148,75 @@ function Home() {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         className="hidden lg:block w-64 shrink-0" >
-        <div className="bg-gray-800 rounded-lg p-4 sticky top-20">
-          <div className="flex items-center gap-2 mb-4">
-            <BookMarked className="w-5 h-5 text-blue-400" />
-            <h2 className="text-lg font-semibold">My Projects</h2>
-          </div>
-          {userProjects.length > 0 ? (
-            <ul className="space-y-3">
-              {userProjects.map((proj) => (
-                <li key={proj.id}>
-                  <Link
-                    to={`/post/${proj.id}`}
-                    className="block p-3 rounded-md hover:bg-gray-700 transition-colors"
-                  >
-                    <h3 className="font-medium text-sm">{proj.title}</h3>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {proj.pitch?.substring(0, 60) || ""}
-                    </p>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-gray-400">No projects yet</p>
-          )}
-        </div>
-        {/* My Analytics Section */}
-        <div className="bg-gray-800 rounded-lg p-4 sticky top-20 mt-8">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="w-5 h-5 text-green-400" />
-            <h2 className="text-lg font-semibold">My Analytics</h2>
-          </div>
-          {analytics && (analytics.most_liked || analytics.most_viewed) ? (
-            <ul className="space-y-3">
-              {analytics.most_liked && (
-                <li>
-                  <div className="flex items-center gap-2">
-                    <Heart className="h-5 w-5 text-red-400" />
-                    <div>
-                      <p className="font-medium text-sm">
-                        Most Liked: {analytics.most_liked.title}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {analytics.most_liked.like_count} likes
-                      </p>
-                    </div>
-                  </div>
-                </li>
+          <div className="sticky top-20 space-y-8">
+            <div className="bg-gray-800 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <BookMarked className="w-5 h-5 text-blue-400" />
+                <h2 className="text-lg font-semibold">My Projects</h2>
+              </div>
+              {userProjects.length > 0 ? (
+                <ul className="space-y-3">
+                  {userProjects.map((proj) => (
+                    <li key={proj.id}>
+                      <Link
+                        to={`/post/${proj.id}`}
+                        className="block p-3 rounded-md hover:bg-gray-700 transition-colors"
+                      >
+                        <h3 className="font-medium text-sm">{proj.title}</h3>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {proj.pitch?.substring(0, 60) || ""}
+                        </p>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-gray-400">No projects yet</p>
               )}
-              {analytics.most_viewed && (
-                <li>
-                  <div className="flex items-center gap-2">
-                    <Eye className="h-5 w-5 text-green-400" />
-                    <div>
-                      <p className="font-medium text-sm">
-                        Most Viewed: {analytics.most_viewed.title}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {analytics.most_viewed.view_count} views
-                      </p>
-                    </div>
-                  </div>
-                </li>
+            </div>
+            {/* My Analytics Section */}
+            <div className="bg-gray-800 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <TrendingUp className="w-5 h-5 text-green-400" />
+                <h2 className="text-lg font-semibold">My Analytics</h2>
+              </div>
+              {analytics && (analytics.most_liked || analytics.most_viewed) ? (
+                <ul className="space-y-3">
+                  {analytics.most_liked && (
+                    <li>
+                      <div className="flex items-center gap-2">
+                        <Heart className="h-5 w-5 text-red-400" />
+                        <div>
+                          <p className="font-medium text-sm">
+                            Most Liked: {analytics.most_liked.title}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            {analytics.most_liked.like_count} likes
+                          </p>
+                        </div>
+                      </div>
+                    </li>
+                  )}
+                  {analytics.most_viewed && (
+                    <li>
+                      <div className="flex items-center gap-2">
+                        <Eye className="h-5 w-5 text-green-400" />
+                        <div>
+                          <p className="font-medium text-sm">
+                            Most Viewed: {analytics.most_viewed.title}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            {analytics.most_viewed.view_count} views
+                          </p>
+                        </div>
+                      </div>
+                    </li>
+                  )}
+                </ul>
+              ) : (
+                <p className="text-sm text-gray-400">No projects yet</p>
               )}
-            </ul>
-          ) : (
-            <p className="text-sm text-gray-400">No projects yet</p>
-          )}
+            </div>
         </div>
       </motion.div>
       <motion.div
@@ -232,9 +242,8 @@ function Home() {
                 className="bg-gray-800 rounded-lg p-6 hover:shadow-xl transition-all hover:scale-[1.02]">
                 <Link to={`/post/${post.id}`} className="block" onClick={async (e) => {
                   await axiosInstance.post("api/posts/view_post/", {post_id:post.id});
-                }
-        
-                  }>
+                  await loadAnalytics();
+                  }}>
 
                   <div className="flex items-center gap-3 mb-4">
                     <img

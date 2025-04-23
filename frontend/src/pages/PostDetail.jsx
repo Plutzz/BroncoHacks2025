@@ -35,35 +35,29 @@ export default function PostDetail() {
     // try to fetch current user, but don’t redirect on failure
     try {
       const userRes = await axiosInstance.get("api/accounts/get_current_user/");
+      setCurrentUser(userRes.data || null);
 
-      if (userRes == null) {
-        setCurrentUser(null);
-      } else {
-        setCurrentUser(userRes.data);
-      }
     } catch {
       setCurrentUser(null);
     }
   }
-  const ensureLoggedIn = async () => {
+
+  const checkAuth = async () => {
     try {
       const res = await axiosInstance.get("api/accounts/check_authentication/");
-      if (!res.data.authenticated) {
-        toast({ title: "Please log in first" });
-        navigate("/login");
-        return false;
-      }
-      return true;
+      return res.data.authenticated;
     } catch {
-      toast({ title: "Please log in first" });
-      navigate("/login");
       return false;
     }
   };
 
 
+
   const handleToggleLike = async () => {
-      if (!(await ensureLoggedIn())) return;
+      if (!(await checkAuth())) {
+        toast({ title: "Log in to like posts" });
+        return;
+      }
       // toggle on server
       await axiosInstance.post("api/posts/like/", { post_id: post.id });
       loadDetail();
@@ -77,7 +71,10 @@ export default function PostDetail() {
 
   const handleComment = async (e) => {
     e.preventDefault();
-    if (!(await ensureLoggedIn())) return;
+    if (!(await checkAuth())) {
+      toast({ title: "Log in to post comments" });
+      return;
+    }
     if (!comment.trim()) return;
 
     const newComment = {
@@ -188,7 +185,7 @@ export default function PostDetail() {
         </div>
       )}
 
-        {currentUser?.user.id === post.author_id && (
+        {currentUser?.id === post.author_id && (
           <>
             <Trash
               variant="destructive"
