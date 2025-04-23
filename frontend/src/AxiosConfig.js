@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 // FOR BASE URL: USE 'http://localhost:8000'
 const axiosInstance = axios.create({
-  baseURL: 'https://bronco-hacks2025.vercel.app/',
+  baseURL: 'https://broncohacks2025-production.up.railway.app/',
   withCredentials: true,  // Important to include cookies (sessionid & csrftoken)
   xsrfCookieName: 'csrftoken',
   xsrfHeaderName: 'X-CSRFToken'
