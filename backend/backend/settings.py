@@ -137,12 +137,16 @@ USE_I18N = True
 USE_TZ = True
 
 
+ # Serve React build only in DEBUG or if you intend to serve via Django
+ # If you’re using Vercel for frontend, you can remove the DIRS/static settings below.
+
+# SINGLE TEMPLATES CONFIGURATION:
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [FRONTEND_DIST],
+        'DIRS': [],           # remove FRONTEND_DIST if using Vercel
         'APP_DIRS': True,
-        'OPTIONS': { 
+        'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -154,14 +158,14 @@ TEMPLATES = [
 ]
 
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    FRONTEND_DIST,
-]
+# Where collectstatic will gather all your app/static/ files:
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+# STATICFILES_DIRS is only needed if you serve frontend build from Django:
+# STATICFILES_DIRS = [FRONTEND_DIST]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
